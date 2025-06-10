@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///home/alexandrtovmach/Projects/archive-duck/editor.duckarchive.com/app/docs/layout.tsx"],"sourcesContent":["export default function DocsLayout({\n  children,\n}: {\n  children: React.ReactNode;\n}) {\n  return (\n    <section className=\"flex flex-col items-center justify-center gap-4 py-8 md:py-10\">\n      <div className=\"inline-block max-w-lg text-center justify-center\">\n        {children}\n      </div>\n    </section>\n  );\n}\n"],"names":[],"mappings":";;;;;AAAe,SAAS,WAAW,EACjC,QAAQ,EAGT;IACC,qBACE,6WAAC;QAAQ,WAAU;kBACjB,cAAA,6WAAC;YAAI,WAAU;sBACZ;;;;;;;;;;;AAIT","debugId":null}}]
+}
