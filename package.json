@@ -7,10 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint --fix",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:generate": "./scripts/prisma-generate.sh",
+    "postinstall": "npm run prisma:generate"
   },
   "dependencies": {
+    "@duckarchive/framework": "github:duckarchive/framework",
+    "@duckarchive/prisma": "github:duckarchive/prisma",
     "@heroui/button": "2.2.21",
     "@heroui/card": "^2.2.20",
     "@heroui/code": "2.2.16",

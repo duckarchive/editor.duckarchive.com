@@ -22,7 +22,8 @@ const projects = [
   },
   {
     name: "Ключ",
-    description: "Індекс осіб, які згадуються в архівних документах. (в розробці)",
+    description:
+      "Індекс осіб, які згадуються в архівних документах. (в розробці)",
     url: "/index",
     isComing: true,
     image: KeySrc,
@@ -43,7 +44,6 @@ const WelcomePage: NextPage = () => {
             key={project.url}
             as={Link}
             href={project.isComing ? undefined : project.url}
-            target="_blank"
           >
             <CardBody className="overflow-visible p-0">
               <Image
@@ -53,12 +53,8 @@ const WelcomePage: NextPage = () => {
               />
             </CardBody>
             <CardFooter className="flex-col text-start items-start">
-              <h3 className="uppercase font-bold">
-                {project.name}
-              </h3>
-              <p className="text-sm">
-                {project.description}
-              </p>
+              <h3 className="uppercase font-bold">{project.name}</h3>
+              <p className="text-sm">{project.description}</p>
             </CardFooter>
           </Card>
         ))}

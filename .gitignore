@@ -56,3 +56,5 @@ coverage/
 
 # AdminJS generated files (if any)
 adminjs/
+
+/generated/
