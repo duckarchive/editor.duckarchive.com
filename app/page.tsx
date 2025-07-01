@@ -1,11 +1,11 @@
 import { NextPage } from "next";
 import { Card, CardBody, CardFooter } from "@heroui/card";
 import Image from "next/image";
+import { Link } from "@heroui/link";
 
 import InspectorSrc from "@/public/images/inspector.png";
 import KeySrc from "@/public/images/key.png";
 import EggSrc from "@/public/images/egg.png";
-import { Link } from "@heroui/link";
 
 const projects = [
   {
@@ -13,6 +13,7 @@ const projects = [
     description: "Сервіс для пошуку архівних справ за реквізитами.",
     url: "/inspector",
     image: InspectorSrc,
+    isComing: true,
   },
   {
     name: "Каталог",
@@ -39,11 +40,11 @@ const WelcomePage: NextPage = () => {
       <div className="gap-2 grid grid-cols-1 md:grid-cols-2 max-w-xl pb-8">
         {projects.map((project) => (
           <Card
-            isPressable={!project.isComing}
-            isDisabled={project.isComing}
             key={project.url}
             as={Link}
             href={project.isComing ? undefined : project.url}
+            isDisabled={project.isComing}
+            isPressable={!project.isComing}
           >
             <CardBody className="overflow-visible p-0">
               <Image
