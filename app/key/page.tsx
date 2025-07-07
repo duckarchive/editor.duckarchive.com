@@ -1,7 +1,7 @@
 import { NextPage } from "next";
-import Link from "next/link";
 
 import { duckkeyPrisma } from "@/lib/db";
+import SelectTable from "@/components/select-table";
 
 const DuckKeyPage: NextPage = async () => {
   const dbTables = await duckkeyPrisma.$queryRaw<{ table_name: string }[]>`
@@ -12,15 +12,11 @@ const DuckKeyPage: NextPage = async () => {
   `;
 
   return (
-    <div>
-      <ul>
-        {dbTables.map(({ table_name }) => (
-          <li key={table_name}>
-            <Link href={`/key/${table_name}`}>{table_name}</Link>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <SelectTable
+      description="Оберіть таблицю для перегляду та управління даними"
+      items={dbTables}
+      title="Список сутностей проєкту index.duckarchive.com"
+    />
   );
 };
 
