@@ -1,0 +1,3 @@
+interface BaseInstance {
+  id: string;
+}

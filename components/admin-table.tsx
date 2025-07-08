@@ -1,48 +1,41 @@
 "use client";
 
 import { DuckTable } from "@duckarchive/framework";
-import { ColDef } from "ag-grid-community";
-
-import { useAdmin } from "@/hooks/useAdmin";
+import { ColDef, SelectionChangedEvent } from "ag-grid-community";
+import { memo } from "react";
 
 interface AdminTableProps {
-  prefix: string;
   columns: ColDef[];
+  rows: any[];
+  onSelectionChanged: (items: BaseInstance[]) => void;
 }
 
-const AdminTable: React.FC<AdminTableProps> = ({ prefix, columns }) => {
-  const {
-    data,
-    error,
-    isLoading,
-    create,
-    update,
-    delete: deleteItem,
-    refresh,
-    isCreating,
-    isUpdating,
-    isDeleting,
-  } = useAdmin<any>(prefix);
+const AdminTable: React.FC<AdminTableProps> = memo(
+  ({ rows, columns, onSelectionChanged }) => {
+    const handleSelectionChange = ({
+      selectedNodes,
+    }: SelectionChangedEvent<BaseInstance, any>) => {
+      if (selectedNodes) {
+        onSelectionChanged(selectedNodes.map((node) => node.data));
+      } else {
+        onSelectionChanged([]);
+      }
+    };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <DuckTable<any>
+        appTheme="dark"
+        columns={columns}
+        rowSelection={{ mode: "multiRow", selectAll: "filtered" }}
+        rows={rows}
+        setActiveFilterId={() => {}}
+        suppressHorizontalScroll={false}
+        onSelectionChanged={handleSelectionChange}
+      />
+    );
   }
+);
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
-
-  if (!data?.length) {
-    return <div>No data available</div>;
-  }
-
-  return (
-    <DuckTable<any>
-      columns={columns}
-      rows={data}
-      setActiveFilterId={() => {}} // not works in page directly
-    />
-  );
-};
+AdminTable.displayName = "AdminTable";
 
 export default AdminTable;
