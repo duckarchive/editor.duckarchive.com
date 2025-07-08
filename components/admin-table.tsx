@@ -1,14 +1,16 @@
 "use client";
 
 import { DuckTable } from "@duckarchive/framework";
+import { ColDef } from "ag-grid-community";
 
 import { useAdmin } from "@/hooks/useAdmin";
 
 interface AdminTableProps {
   prefix: string;
+  columns: ColDef[];
 }
 
-const AdminTable: React.FC<AdminTableProps> = ({ prefix }) => {
+const AdminTable: React.FC<AdminTableProps> = ({ prefix, columns }) => {
   const {
     data,
     error,
@@ -36,7 +38,7 @@ const AdminTable: React.FC<AdminTableProps> = ({ prefix }) => {
 
   return (
     <DuckTable<any>
-      columns={[{ field: "birth_date", headerName: "birth_date" }]}
+      columns={columns}
       rows={data}
       setActiveFilterId={() => {}} // not works in page directly
     />
