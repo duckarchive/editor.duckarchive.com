@@ -6,6 +6,7 @@ import { FaDatabase } from "react-icons/fa";
 interface SelectTableProps {
   title: string;
   description?: string;
+  prefix: string;
   items: { table_name: string }[];
 }
 
@@ -13,6 +14,7 @@ const SelectTable: React.FC<SelectTableProps> = ({
   items,
   title,
   description,
+  prefix,
 }) => {
   return (
     <div>
@@ -24,7 +26,7 @@ const SelectTable: React.FC<SelectTableProps> = ({
 
         <div className="flex gap-4">
           {items.map(({ table_name }) => (
-            <Link key={table_name} href={`/key/${table_name}`}>
+            <Link key={table_name} href={`${prefix}/${table_name}`}>
               <Card className="cursor-pointer border-2 border-transparent hover:border-blue-300">
                 <CardBody className="flex-row items-center gap-2">
                   <FaDatabase className="w-12 h-12 text-gray-400" />

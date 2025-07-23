@@ -1,10 +1,10 @@
 import { NextPage } from "next";
 
-import { duckkeyPrisma } from "@/lib/db";
+import { catalogPrisma } from "@/lib/db";
 import SelectTable from "@/components/select-table";
 
-const DuckKeyPage: NextPage = async () => {
-  const dbTables = await duckkeyPrisma.$queryRaw<{ table_name: string }[]>`
+const DuckCatalogPage: NextPage = async () => {
+  const dbTables = await catalogPrisma.$queryRaw<{ table_name: string }[]>`
     SELECT table_name
     FROM information_schema.tables
     WHERE table_schema = 'public' and table_name != '_prisma_migrations'
@@ -15,10 +15,10 @@ const DuckKeyPage: NextPage = async () => {
     <SelectTable
       description="Оберіть таблицю для перегляду та управління даними"
       items={dbTables}
-      prefix="/key"
-      title="Список сутностей проєкту index.duckarchive.com"
+      prefix="/catalog"
+      title="Список сутностей проєкту catalog.duckarchive.com"
     />
   );
 };
 
-export default DuckKeyPage;
+export default DuckCatalogPage;
