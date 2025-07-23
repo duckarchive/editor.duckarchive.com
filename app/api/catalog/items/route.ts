@@ -4,17 +4,17 @@ import { catalogPrisma } from "@/lib/db";
 
 export async function GET() {
   try {
-    const archives = await catalogPrisma.archive.findMany({
+    const items = await catalogPrisma.item.findMany({
       take: 100,
       orderBy: { created_at: "desc" },
     });
 
-    return NextResponse.json(archives);
+    return NextResponse.json(items);
   } catch (error) {
-    console.error("GET archives Error:", error);
+    console.error("GET items Error:", error);
 
     return NextResponse.json(
-      { error: "Failed to fetch archives" },
+      { error: "Failed to fetch items" },
       { status: 500 }
     );
   }
