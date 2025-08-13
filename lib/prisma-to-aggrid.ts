@@ -5,6 +5,9 @@ import duckarchive from "@/generated/prisma/duckarchive-client/runtime/library";
 import duckkey from "@/generated/prisma/duckkey-client/runtime/library";
 import inspector from "@/generated/prisma/inspector-client/runtime/library";
 
+const READONLY_FIELDS: string[] = [];
+const HIDDEN_FIELDS: string[] = ["id"];
+
 type BaseDMMF =
   | catalog.BaseDMMF
   | duckarchive.BaseDMMF
@@ -21,13 +24,16 @@ const createColumnsForModel = (
   const columns: ColDef[] = [];
 
   model.fields.forEach((field) => {
-    if (!field.relationName) {
+    if (!field.relationName && !HIDDEN_FIELDS.includes(field.name)) {
+      const isReadonly = READONLY_FIELDS.includes(field.name);
+
       columns.push({
         field: field.name,
         headerName: field.name,
-        sortable: true,
-        filter: true,
-        resizable: true,
+        sortable: isReadonly ? false : true,
+        filter: isReadonly ? false : true,
+        resizable: isReadonly ? false : true,
+        cellStyle: isReadonly ? { opacity: 0.5 } : {},
       });
     }
   });
@@ -44,6 +50,8 @@ const prisma2agGrid = (dmmf: BaseDMMF): PrismaInstanceAgGrid => {
     columnsHashTable[model.dbName || model.name.toLowerCase()] =
       createColumnsForModel(model);
   });
+
+  console.log(columnsHashTable);
 
   return columnsHashTable;
 };

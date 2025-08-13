@@ -4,10 +4,12 @@ import useSWR, { mutate } from "swr";
 import { useState } from "react";
 
 import { fetcher } from "@/lib/fetcher";
+import { buildQueryString } from "@/lib/api-helpers";
 
 interface UseAdminOptions {
   revalidateOnFocus?: boolean;
   revalidateOnReconnect?: boolean;
+  filters?: Record<string, any>;
 }
 
 interface AdminHookReturn<T> {
@@ -31,7 +33,9 @@ export const useAdmin = <T extends { id: string | number }>(
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const apiUrl = `/api/${prefix}`;
+  const queryString = buildQueryString(options.filters || {});
+  const apiUrl = `/api/${prefix}${queryString}`;
+
   const { data, error, isLoading } = useSWR<T[]>(apiUrl, fetcher, {
     revalidateOnFocus: options.revalidateOnFocus ?? false,
     revalidateOnReconnect: options.revalidateOnReconnect ?? true,
@@ -40,7 +44,7 @@ export const useAdmin = <T extends { id: string | number }>(
   const create = async (item: Omit<T, "id">): Promise<T> => {
     setIsCreating(true);
     try {
-      const response = await fetch(apiUrl, {
+      const response = await fetch(`/api/${prefix}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -54,13 +58,8 @@ export const useAdmin = <T extends { id: string | number }>(
 
       const newItem = await response.json();
 
-      // Optimistically update the cache
-      mutate(
-        apiUrl,
-        (current: T[] | undefined) =>
-          current ? [...current, newItem] : [newItem],
-        false,
-      );
+      // Invalidate cache to refetch with filters
+      mutate(apiUrl);
 
       return newItem;
     } catch (error) {
@@ -73,7 +72,7 @@ export const useAdmin = <T extends { id: string | number }>(
   const update = async (id: string | number, item: Partial<T>): Promise<T> => {
     setIsUpdating(true);
     try {
-      const response = await fetch(`${apiUrl}/${id}`, {
+      const response = await fetch(`/api/${prefix}/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -87,19 +86,8 @@ export const useAdmin = <T extends { id: string | number }>(
 
       const updatedItem = await response.json();
 
-      // Optimistically update the cache
-      mutate(
-        apiUrl,
-        (current: T[] | undefined) =>
-          current
-            ? current.map((currentItem) =>
-                currentItem.id === id
-                  ? { ...currentItem, ...updatedItem }
-                  : currentItem,
-              )
-            : [updatedItem],
-        false,
-      );
+      // Invalidate cache to refetch with filters
+      mutate(apiUrl);
 
       return updatedItem;
     } catch (error) {
@@ -112,7 +100,7 @@ export const useAdmin = <T extends { id: string | number }>(
   const deleteItem = async (id: string | number): Promise<void> => {
     setIsDeleting(true);
     try {
-      const response = await fetch(`${apiUrl}/${id}`, {
+      const response = await fetch(`/api/${prefix}/${id}`, {
         method: "DELETE",
       });
 
@@ -120,13 +108,8 @@ export const useAdmin = <T extends { id: string | number }>(
         throw new Error("Failed to delete item");
       }
 
-      // Optimistically update the cache
-      mutate(
-        apiUrl,
-        (current: T[] | undefined) =>
-          current ? current.filter((item) => item.id !== id) : [],
-        false,
-      );
+      // Invalidate cache to refetch with filters
+      mutate(apiUrl);
     } catch (error) {
       throw error;
     } finally {

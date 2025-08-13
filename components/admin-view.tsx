@@ -1,7 +1,7 @@
 "use client";
 
 import { ColDef } from "ag-grid-community";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 
 import { useAdmin } from "@/hooks/useAdmin";
 import AdminTable from "@/components/admin-table";
@@ -13,6 +13,7 @@ interface AdminViewProps {
 }
 
 const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
+  const [filters, setFilters] = useState<Record<string, any>>({});
   const {
     data,
     error,
@@ -24,29 +25,26 @@ const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
     isCreating,
     isUpdating,
     isDeleting,
-  } = useAdmin<BaseInstance>(prefix);
+  } = useAdmin<BaseInstance>(prefix, { filters });
+
   const [selectedItems, setSelectedItems] = useState<BaseInstance[]>([]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
+    setFilters(newFilters);
+  }, []);
 
   if (error) {
     return <div>Error: {error.message}</div>;
   }
-
-  if (!data?.length) {
-    return <div>No data available</div>;
-  }
-
-  console.log("Selected items:", selectedItems);
 
   return (
     <div className="h-full flex flex-col">
       <AdminPanel items={selectedItems} />
       <AdminTable
         columns={columns}
-        rows={data}
+        isLoading={isLoading}
+        rows={data || []}
+        onFilterChanged={handleFilterChange}
         onSelectionChanged={setSelectedItems}
       />
     </div>
