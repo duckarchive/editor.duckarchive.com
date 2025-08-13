@@ -16,7 +16,7 @@ const DuckCatalogTablePage: NextPage<DuckCatalogTablePageProps> = async ({
   const cols = prisma2agGrid(Prisma.dmmf);
   const prefix = `catalog/${instance.toString()}`;
 
-  return <AdminView prefix={prefix} columns={cols[instance.toString()]} />;
+  return <AdminView columns={cols[instance.toString()]} prefix={prefix} />;
 };
 
 export default DuckCatalogTablePage;

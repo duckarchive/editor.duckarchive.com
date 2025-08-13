@@ -28,10 +28,15 @@ const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
   } = useAdmin<BaseInstance>(prefix, { filters });
 
   const [selectedItems, setSelectedItems] = useState<BaseInstance[]>([]);
+  const [activeItem, setActiveItem] = useState<BaseInstance>();
 
   const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
     setFilters(newFilters);
   }, []);
+
+  const handleResetActiveItem = () => {
+    setActiveItem(undefined);
+  };
 
   if (error) {
     return <div>Error: {error.message}</div>;
@@ -39,12 +44,17 @@ const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
 
   return (
     <div className="h-full flex flex-col">
-      <AdminPanel items={selectedItems} />
+      <AdminPanel
+        activeItem={activeItem}
+        items={selectedItems}
+        onClose={handleResetActiveItem}
+      />
       <AdminTable
         columns={columns}
         isLoading={isLoading}
         rows={data || []}
         onFilterChanged={handleFilterChange}
+        onRowClick={setActiveItem}
         onSelectionChanged={setSelectedItems}
       />
     </div>

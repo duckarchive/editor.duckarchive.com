@@ -13,26 +13,44 @@ import { Chip } from "@heroui/chip";
 import { IoSettings, IoTrash, IoCreate } from "react-icons/io5";
 
 interface AdminPanelProps {
-  items: Array<{ id: string | number }>;
+  items: Array<BaseInstance>;
+  activeItem?: BaseInstance;
+  onClose?: () => void;
 }
 
-const AdminPanel: React.FC<AdminPanelProps> = ({ items }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+const AdminPanel: React.FC<AdminPanelProps> = ({
+  items,
+  activeItem,
+  onClose: onCloseProp,
+}) => {
+  const { isOpen, onOpen, onClose } = useDisclosure({
+    isOpen: !!activeItem,
+  });
+
+  const handleCloseModal = () => {
+    onCloseProp?.();
+    onClose();
+  };
 
   return (
     <>
       <Button
-        onPress={onOpen}
-        color="primary"
-        variant="bordered"
-        startContent={<IoSettings className="w-4 h-4" />}
-        isDisabled={items.length === 0}
         className="mb-4"
+        color="primary"
+        isDisabled={items.length === 0}
+        startContent={<IoSettings className="w-4 h-4" />}
+        variant="bordered"
+        onPress={onOpen}
       >
         Manage Selected ({items.length})
       </Button>
 
-      <Modal isOpen={isOpen} onClose={onClose} size="2xl">
+      <Modal
+        backdrop="blur"
+        isOpen={isOpen}
+        size="2xl"
+        onClose={handleCloseModal}
+      >
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
             <h3 className="text-lg font-semibold">Selected Items</h3>
@@ -46,13 +64,22 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ items }) => {
               <div>
                 <h4 className="font-medium mb-2">Item IDs:</h4>
                 <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+                  {activeItem && (
+                    <Chip
+                      key={activeItem.id}
+                      className="font-mono"
+                      color="primary"
+                    >
+                      {activeItem.id}
+                    </Chip>
+                  )}
                   {items.map((item, index) => (
                     <Chip
                       key={index}
-                      variant="flat"
+                      className="font-mono"
                       color="primary"
                       size="sm"
-                      className="font-mono"
+                      variant="flat"
                     >
                       {item.id}
                     </Chip>
@@ -73,17 +100,17 @@ const AdminPanel: React.FC<AdminPanelProps> = ({ items }) => {
           <ModalFooter className="gap-2">
             <Button
               color="danger"
-              variant="light"
-              startContent={<IoTrash className="w-4 h-4" />}
               isDisabled={items.length === 0}
+              startContent={<IoTrash className="w-4 h-4" />}
+              variant="light"
             >
               Delete Selected
             </Button>
             <Button
               color="primary"
-              variant="light"
-              startContent={<IoCreate className="w-4 h-4" />}
               isDisabled={items.length === 0}
+              startContent={<IoCreate className="w-4 h-4" />}
+              variant="light"
             >
               Bulk Edit
             </Button>

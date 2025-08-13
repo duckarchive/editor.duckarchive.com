@@ -19,7 +19,7 @@ interface PrismaInstanceAgGrid {
 }
 
 const createColumnsForModel = (
-  model: BaseDMMF["datamodel"]["models"][number]
+  model: BaseDMMF["datamodel"]["models"][number],
 ): ColDef[] => {
   const columns: ColDef[] = [];
 
@@ -50,8 +50,6 @@ const prisma2agGrid = (dmmf: BaseDMMF): PrismaInstanceAgGrid => {
     columnsHashTable[model.dbName || model.name.toLowerCase()] =
       createColumnsForModel(model);
   });
-
-  console.log(columnsHashTable);
 
   return columnsHashTable;
 };

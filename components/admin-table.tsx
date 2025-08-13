@@ -1,23 +1,32 @@
 "use client";
 
 import { DuckTable } from "@duckarchive/framework";
+import { memo } from "react";
 import {
   ColDef,
   SelectionChangedEvent,
   FilterChangedEvent,
+  RowClickedEvent,
 } from "ag-grid-community";
-import { memo } from "react";
 
 interface AdminTableProps {
   isLoading?: boolean;
   columns: ColDef[];
   rows: any[];
+  onRowClick: (rowData?: BaseInstance) => void;
   onSelectionChanged: (items: BaseInstance[]) => void;
   onFilterChanged: (filters: Record<string, any>) => void;
 }
 
 const AdminTable: React.FC<AdminTableProps> = memo(
-  ({ rows, columns, onSelectionChanged, onFilterChanged, isLoading }) => {
+  ({
+    rows,
+    columns,
+    onSelectionChanged,
+    onFilterChanged,
+    onRowClick,
+    isLoading,
+  }) => {
     const handleSelectionChange = ({
       selectedNodes,
     }: SelectionChangedEvent<BaseInstance, any>) => {
@@ -34,8 +43,12 @@ const AdminTable: React.FC<AdminTableProps> = memo(
       onFilterChanged(filterModel);
     };
 
+    const handleClick = (event: RowClickedEvent<BaseInstance, any>) => {
+      onRowClick(event.data);
+    };
+
     return (
-      <DuckTable<any>
+      <DuckTable<BaseInstance>
         appTheme="dark"
         columns={columns}
         isLoading={isLoading}
@@ -44,10 +57,11 @@ const AdminTable: React.FC<AdminTableProps> = memo(
         setActiveFilterId={() => {}}
         suppressHorizontalScroll={false}
         onFilterChanged={handleFilterChange}
+        onRowClicked={handleClick}
         onSelectionChanged={handleSelectionChange}
       />
     );
-  }
+  },
 );
 
 AdminTable.displayName = "AdminTable";
