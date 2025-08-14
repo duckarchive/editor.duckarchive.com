@@ -1,13 +1,12 @@
 "use client";
 
-import type { SearchControlOptions } from "leaflet-geosearch/dist/SearchControl";
-
 import { useEffect, useState } from "react";
 import { Card, CardBody } from "@heroui/card";
 import { Input } from "@heroui/input";
-import { useMapEvents, useMap } from "react-leaflet";
-import { OpenStreetMapProvider, GeoSearchControl } from "leaflet-geosearch";
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import { MapContainer, TileLayer } from "react-leaflet";
+
+import LocationMarker from "./LocationMarker";
+import MapLocationSearch from "./MapLocationSearch";
 
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
@@ -25,57 +24,7 @@ interface MapInputProps {
   errorMessage?: string;
 }
 
-interface LocationMarkerProps {
-  value: [number, number];
-  onChange: (position: [number, number]) => void;
-}
-
-const LocationMarker: React.FC<LocationMarkerProps> = ({ value, onChange }) => {
-  const map = useMapEvents({
-    click(e: any) {
-      if (!e.latlng) return;
-      const { lat, lng } = e.latlng;
-
-      onChange([lat, lng]);
-      map.flyTo(e.latlng, map.getZoom());
-    },
-  });
-
-  console.log("LocationMarker value:", value);
-
-  return value ? <Marker position={value} /> : null;
-};
-
-const MapLocationSearch = () => {
-  const provider = new OpenStreetMapProvider({
-    params: {
-      "accept-language": "ua",
-      countrycodes: "ua,pl,by,ru,ro,md,tr",
-      limit: 5,
-      email: "admin@duckarchive.com",
-    },
-  });
-
-  const config: SearchControlOptions = {
-    provider,
-    style: "bar",
-    showMarker: false,
-  };
-  // @ts-ignore
-  const searchControl = new GeoSearchControl(config);
-
-  const map = useMap();
-
-  useEffect(() => {
-    map.addControl(searchControl);
-
-    return () => {
-      map.removeControl(searchControl);
-    };
-  }, []);
-
-  return null;
-};
+// LocationMarker and MapLocationSearch are now imported from their own files.
 
 const MapInput: React.FC<MapInputProps> = ({
   lat = 49.8397,
