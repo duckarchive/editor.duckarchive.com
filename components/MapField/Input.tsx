@@ -3,10 +3,8 @@
 import { useEffect, useState } from "react";
 import { Card, CardBody } from "@heroui/card";
 import { Input } from "@heroui/input";
-import { MapContainer, TileLayer } from "react-leaflet";
 
-import LocationMarker from "./LocationMarker";
-import MapLocationSearch from "./MapLocationSearch";
+import Map from "./Map";
 
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
@@ -144,23 +142,8 @@ const MapInput: React.FC<MapInputProps> = ({
 
       <Card>
         <CardBody className="p-0">
-          <div className="h-64 w-full">
-            <MapContainer
-              scrollWheelZoom
-              center={[49.8397, 24.0297]}
-              style={{ height: "100%", width: "100%" }}
-              zoom={13}
-            >
-              <MapLocationSearch />
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              <LocationMarker
-                value={position}
-                onChange={handlePositionChange}
-              />
-            </MapContainer>
+          <div className="h-[500px] w-full">
+            <Map position={position} onPositionChange={handlePositionChange} />
           </div>
         </CardBody>
       </Card>

@@ -7,7 +7,7 @@ import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import { Switch } from "@heroui/switch";
 
-import MapField, { HistoricalMap } from "@/components/MapField";
+import MapField from "@/components/MapField";
 
 interface FormValues extends BaseInstance {
   [key: string]: any;
@@ -298,8 +298,6 @@ const AdminPanelForm: React.FC<AdminPanelFormProps> = ({
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
-      <HistoricalMap />
-
       {/* Coordinate fields grouped together */}
       {coordinateFields.length >= 2 && (
         <div className="space-y-2">
