@@ -7,11 +7,17 @@ import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import { Switch } from "@heroui/switch";
 
-import MapInput from "./map-input";
+import MapField from "./MapField";
+
+interface FormValues extends BaseInstance {
+  [key: string]: any;
+  lat?: number | null;
+  lng?: number | null;
+}
 
 interface AdminPanelFormProps {
-  defaultValues: Record<string, any>;
-  onSubmit: (values: Record<string, any>) => void;
+  defaultValues: FormValues;
+  onSubmit: (values: FormValues) => void;
   onCancel: () => void;
   isLoading?: boolean;
 }
@@ -114,8 +120,7 @@ const AdminPanelForm: React.FC<AdminPanelFormProps> = ({
   onCancel,
   isLoading = false,
 }) => {
-  const [formValues, setFormValues] =
-    useState<Record<string, any>>(defaultValues);
+  const [formValues, setFormValues] = useState<FormValues>(defaultValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -296,12 +301,12 @@ const AdminPanelForm: React.FC<AdminPanelFormProps> = ({
       {/* Coordinate fields grouped together */}
       {coordinateFields.length >= 2 && (
         <div className="space-y-2">
-          <MapInput
+          <MapField
             errorMessage={errors.lat || errors.lng}
             isInvalid={!!(errors.lat || errors.lng)}
             isRequired={coordinateFields.some((f) => f.required)}
-            lat={formValues.lat}
-            lng={formValues.lng}
+            lat={formValues.lat || undefined}
+            lng={formValues.lng || undefined}
             onLatChange={(lat) => handleInputChange("lat", lat)}
             onLngChange={(lng) => handleInputChange("lng", lng)}
           />

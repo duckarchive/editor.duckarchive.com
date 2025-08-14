@@ -49,7 +49,7 @@ const AdminTable: React.FC<AdminTableProps> = memo(
 
     return (
       <DuckTable<BaseInstance>
-        appTheme="dark"
+        appTheme="light"
         columns={columns}
         isLoading={isLoading}
         rowSelection={{ mode: "multiRow", selectAll: "filtered" }}

@@ -1,24 +1,18 @@
 "use client";
 
+import type { SearchControlOptions } from "leaflet-geosearch/dist/SearchControl";
+
 import { useEffect, useState } from "react";
 import { Card, CardBody } from "@heroui/card";
 import { Input } from "@heroui/input";
-import dynamic from "next/dynamic";
-import { useMapEvents } from "react-leaflet";
+import { useMapEvents, useMap } from "react-leaflet";
+import { OpenStreetMapProvider, GeoSearchControl } from "leaflet-geosearch";
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
 
-// Dynamically import map components to avoid SSR issues
-const MapContainer = dynamic(
-  () => import("react-leaflet").then((mod) => mod.MapContainer),
-  { ssr: false },
-);
-const TileLayer = dynamic(
-  () => import("react-leaflet").then((mod) => mod.TileLayer),
-  { ssr: false },
-);
-const Marker = dynamic(
-  () => import("react-leaflet").then((mod) => mod.Marker),
-  { ssr: false },
-);
+import "leaflet/dist/leaflet.css";
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
+import "leaflet-geosearch/assets/css/leaflet.css";
+import "leaflet-defaulticon-compatibility";
 
 interface MapInputProps {
   lat?: number;
@@ -32,24 +26,55 @@ interface MapInputProps {
 }
 
 interface LocationMarkerProps {
-  position?: [number, number];
-  setPosition: (position: [number, number]) => void;
+  value: [number, number];
+  onChange: (position: [number, number]) => void;
 }
 
-const LocationMarker: React.FC<LocationMarkerProps> = ({
-  position,
-  setPosition,
-}) => {
+const LocationMarker: React.FC<LocationMarkerProps> = ({ value, onChange }) => {
   const map = useMapEvents({
     click(e: any) {
+      if (!e.latlng) return;
       const { lat, lng } = e.latlng;
 
-      setPosition([lat, lng]);
+      onChange([lat, lng]);
       map.flyTo(e.latlng, map.getZoom());
     },
   });
 
-  return position ? <Marker position={position} /> : null;
+  console.log("LocationMarker value:", value);
+
+  return value ? <Marker position={value} /> : null;
+};
+
+const MapLocationSearch = () => {
+  const provider = new OpenStreetMapProvider({
+    params: {
+      "accept-language": "ua",
+      countrycodes: "ua,pl,by,ru,ro,md,tr",
+      limit: 5,
+      email: "admin@duckarchive.com",
+    },
+  });
+
+  const config: SearchControlOptions = {
+    provider,
+    style: "bar",
+    showMarker: false,
+  };
+  // @ts-ignore
+  const searchControl = new GeoSearchControl(config);
+
+  const map = useMap();
+
+  useEffect(() => {
+    map.addControl(searchControl);
+
+    return () => {
+      map.removeControl(searchControl);
+    };
+  }, []);
+
+  return null;
 };
 
 const MapInput: React.FC<MapInputProps> = ({
@@ -57,12 +82,12 @@ const MapInput: React.FC<MapInputProps> = ({
   lng = 24.0297,
   onLatChange,
   onLngChange,
-  label = "Координати на карті",
+  label = "Координати",
   isRequired = false,
   isInvalid = false,
   errorMessage,
 }) => {
-  const [position, setPosition] = useState<[number, number]>();
+  const [position, setPosition] = useState<[number, number]>([lat, lng]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -76,30 +101,33 @@ const MapInput: React.FC<MapInputProps> = ({
   }, [lat, lng]);
 
   const handlePositionChange = (newPosition: [number, number]) => {
+    console.log("handlePositionChange");
     setPosition(newPosition);
     onLatChange(newPosition[0]);
     onLngChange(newPosition[1]);
   };
 
   const handleLatInputChange = (value: string) => {
-    const numValue = parseFloat(value);
+    console.log("handleLatInputChange");
+    const intValue = parseFloat(value);
 
-    if (!isNaN(numValue)) {
-      const newPosition: [number, number] = [numValue, lng];
+    if (!isNaN(intValue)) {
+      const newPosition: [number, number] = [intValue, lng];
 
       setPosition(newPosition);
-      onLatChange(numValue);
+      onLatChange(intValue);
     }
   };
 
   const handleLngInputChange = (value: string) => {
-    const numValue = parseFloat(value);
+    console.log("handleLngInputChange");
+    const intValue = parseFloat(value);
 
-    if (!isNaN(numValue)) {
-      const newPosition: [number, number] = [lat, numValue];
+    if (!isNaN(intValue)) {
+      const newPosition: [number, number] = [lat, intValue];
 
       setPosition(newPosition);
-      onLngChange(numValue);
+      onLngChange(intValue);
     }
   };
 
@@ -169,18 +197,19 @@ const MapInput: React.FC<MapInputProps> = ({
         <CardBody className="p-0">
           <div className="h-64 w-full">
             <MapContainer
+              scrollWheelZoom
               center={[49.8397, 24.0297]}
-              scrollWheelZoom={false}
               style={{ height: "100%", width: "100%" }}
               zoom={13}
             >
+              <MapLocationSearch />
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               <LocationMarker
-                position={position}
-                setPosition={handlePositionChange}
+                value={position}
+                onChange={handlePositionChange}
               />
             </MapContainer>
           </div>
