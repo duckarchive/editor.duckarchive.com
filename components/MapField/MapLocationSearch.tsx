@@ -3,6 +3,8 @@ import { useMap } from "react-leaflet";
 import { OpenStreetMapProvider } from "leaflet-geosearch";
 import { Autocomplete, AutocompleteItem } from "@heroui/autocomplete";
 
+import useStopPropagation from "@/components/MapField/useStopPropagation";
+
 const SearchSVG = () => (
   <svg
     className="w-4 h-4 text-gray-400"
@@ -52,9 +54,7 @@ interface SearchResult {
 const MapLocationSearch = memo(() => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
-
-  console.log("render");
-
+  const autocompleteRef = useStopPropagation();
   const map = useMap();
 
   const provider = new OpenStreetMapProvider({
@@ -73,7 +73,6 @@ const MapLocationSearch = memo(() => {
 
         return;
       }
-      console.log("searchLocations", searchQuery);
 
       try {
         const searchResults = await provider.search({ query: searchQuery });
@@ -116,8 +115,6 @@ const MapLocationSearch = memo(() => {
     if (key) {
       const result = results[key as number];
 
-      console.log("handleSelect", key, result, results);
-
       if (result) {
         handleLocationSelect(result);
       }
@@ -125,29 +122,38 @@ const MapLocationSearch = memo(() => {
   };
 
   return (
-    <Autocomplete
-      aria-label="Пошук міста або адреси..."
-      className="absolute z-[1000] top-1 left-1 pointer-events-auto"
-      defaultItems={results}
-      inputValue={query}
-      placeholder="Пошук міста або адреси..."
-      size="sm"
-      startContent={<SearchSVG />}
-      variant="flat"
-      onClick={(e) => e.stopPropagation()}
-      onInputChange={handleInputChange}
-      onSelectionChange={handleSelect}
+    <div
+      ref={autocompleteRef} // Prevents click events from propagating to the map
+      className="absolute z-[1000] top-1 left-1 right-1 w-auto"
     >
-      {(result) => (
-        <AutocompleteItem
-          key={results.indexOf(result)}
-          startContent={<PinSVG />}
-          textValue={result.label}
-        >
-          {result.label}
-        </AutocompleteItem>
-      )}
-    </Autocomplete>
+      <Autocomplete
+        aria-label="Пошук міста або адреси..."
+        className="w-full"
+        defaultItems={results}
+        inputValue={query}
+        listboxProps={{
+          emptyContent: "Нічого не знайдено. Уточніть свій запит.",
+        }}
+        placeholder="Пошук міста або адреси..."
+        size="sm"
+        startContent={<SearchSVG />}
+        variant="flat"
+        onClick={(e) => e.stopPropagation()}
+        onInputChange={handleInputChange}
+        onMouseDown={(e) => e.stopPropagation()}
+        onSelectionChange={handleSelect}
+      >
+        {(result) => (
+          <AutocompleteItem
+            key={results.indexOf(result)}
+            startContent={<PinSVG />}
+            textValue={result.label}
+          >
+            {result.label}
+          </AutocompleteItem>
+        )}
+      </Autocomplete>
+    </div>
   );
 });
 

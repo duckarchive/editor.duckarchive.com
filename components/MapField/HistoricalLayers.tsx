@@ -15,6 +15,8 @@ import { Slider } from "@heroui/slider";
 
 import { useMapData } from "./useMapData";
 
+import useStopPropagation from "@/components/MapField/useStopPropagation";
+
 // Color palette for countries (OHM data)
 const colorPalette = [
   "red",
@@ -98,6 +100,8 @@ const HistoricalLayers: React.FC<HistoricalLayersProps> = ({ year = 1897 }) => {
   const [yearOverride, setYearOverride] = useState(year);
   const { countries, states } = useMapData(yearOverride);
   const countriesRef = useRef<L.GeoJSON>(null);
+  const tooltipRef = useStopPropagation();
+  const yearSelectRef = useStopPropagation();
   const map = useMap();
 
   useEffect(() => {
@@ -131,6 +135,10 @@ const HistoricalLayers: React.FC<HistoricalLayersProps> = ({ year = 1897 }) => {
       map.off("mousemove", handleMouseMove);
     };
   }, [map, countriesRef]);
+
+  // useEffect(() => {
+  //   DomEvent.disableClickPropagation(tooltipRef.current);
+  // }, []);
 
   const handleYearChange = (newYear: number | number[]) => {
     if (Array.isArray(newYear)) {
@@ -166,7 +174,10 @@ const HistoricalLayers: React.FC<HistoricalLayersProps> = ({ year = 1897 }) => {
 
       {/* Fixed tooltip at bottom left corner */}
       {(hoveredCountryFeature || hoveredStateFeature) && (
-        <Card className="max-w-sm absolute z-[500] bottom-1 left-1 pointer-events-none">
+        <Card
+          ref={tooltipRef}
+          className="max-w-sm absolute z-[500] bottom-1 left-1 pointer-events-none"
+        >
           <CardBody>
             <div className="flex flex-col gap-1">
               {hoveredStateFeature?.properties?.Name_RU && (
@@ -186,7 +197,10 @@ const HistoricalLayers: React.FC<HistoricalLayersProps> = ({ year = 1897 }) => {
           </CardBody>
         </Card>
       )}
-      <Card className="absolute z-[1000] bottom-1 right-1 pointer-events-none">
+      <Card
+        ref={yearSelectRef}
+        className="absolute z-[1000] bottom-1 right-1 pointer-events-none"
+      >
         <CardBody className="p-0 overflow-hidden">
           <Slider
             className="mb-0"
