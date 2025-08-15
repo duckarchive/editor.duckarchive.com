@@ -11,6 +11,7 @@ import { GeoJSON, GeoJSONProps, useMap } from "react-leaflet";
 import { Card, CardBody } from "@heroui/card";
 import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
 import { point as turfPoint } from "@turf/helpers";
+import { Slider } from "@heroui/slider";
 
 import { useMapData } from "./useMapData";
 
@@ -57,7 +58,7 @@ const stateDefaultStyle = {
 
 const stateHighlightStyle = {
   ...stateDefaultStyle,
-  fillOpacity: 0.8,
+  fillOpacity: 0.5,
 };
 
 const CountriesLayer = memo(
@@ -88,13 +89,14 @@ const StatesLayer = memo(({ data, onEachFeature }: GeoJSONProps) =>
 StatesLayer.displayName = "StatesLayer";
 
 interface HistoricalLayersProps {
-  year: number;
+  year?: number;
 }
 
-const HistoricalLayers: React.FC<HistoricalLayersProps> = ({ year }) => {
+const HistoricalLayers: React.FC<HistoricalLayersProps> = ({ year = 1897 }) => {
   const [hoveredCountryFeature, setHoveredCountryFeature] = useState<any>(null);
   const [hoveredStateFeature, setHoveredStateFeature] = useState<any>(null);
-  const { countries, states } = useMapData(year);
+  const [yearOverride, setYearOverride] = useState(year);
+  const { countries, states } = useMapData(yearOverride);
   const countriesRef = useRef<L.GeoJSON>(null);
   const map = useMap();
 
@@ -128,7 +130,15 @@ const HistoricalLayers: React.FC<HistoricalLayersProps> = ({ year }) => {
     return () => {
       map.off("mousemove", handleMouseMove);
     };
-  }, [map]);
+  }, [map, countriesRef]);
+
+  const handleYearChange = (newYear: number | number[]) => {
+    if (Array.isArray(newYear)) {
+      setYearOverride(newYear[0]);
+    } else {
+      setYearOverride(newYear);
+    }
+  };
 
   const onEachStateFeature = useCallback(
     (feature: GeoJSON.Feature, layer: Layer) => {
@@ -156,7 +166,7 @@ const HistoricalLayers: React.FC<HistoricalLayersProps> = ({ year }) => {
 
       {/* Fixed tooltip at bottom left corner */}
       {(hoveredCountryFeature || hoveredStateFeature) && (
-        <Card className="max-w-sm absolute z-[1000] bottom-[20] left-[20] pointer-events-none">
+        <Card className="max-w-sm absolute z-[500] bottom-1 left-1 pointer-events-none">
           <CardBody>
             <div className="flex flex-col gap-1">
               {hoveredStateFeature?.properties?.Name_RU && (
@@ -176,6 +186,28 @@ const HistoricalLayers: React.FC<HistoricalLayersProps> = ({ year }) => {
           </CardBody>
         </Card>
       )}
+      <Card className="absolute z-[1000] bottom-1 right-1 pointer-events-none">
+        <CardBody className="p-0 overflow-hidden">
+          <Slider
+            className="mb-0"
+            color="warning"
+            defaultValue={year}
+            getValue={(year) => `${year}`}
+            label="Рік"
+            // marks={[
+            //   {
+            //     value: 1897,
+            //     label: "1897",
+            //   },
+            // ]}
+            maxValue={2025}
+            minValue={1600}
+            // orientation="vertical"
+            size="sm"
+            onChangeEnd={handleYearChange}
+          />
+        </CardBody>
+      </Card>
     </>
   );
 };

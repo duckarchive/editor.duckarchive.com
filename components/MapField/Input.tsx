@@ -115,6 +115,10 @@ const MapInput: React.FC<MapInputProps> = ({
       <label className="block text-sm font-medium mb-2">
         {label}
         {isRequired && <span className="text-red-500 ml-1">*</span>}
+
+        <p className="text-gray-500 text-xs mt-1">
+          Клацніть на карті, щоб вибрати координати
+        </p>
       </label>
 
       <div className="flex gap-2 mb-2">
@@ -151,10 +155,6 @@ const MapInput: React.FC<MapInputProps> = ({
       {isInvalid && errorMessage && (
         <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
       )}
-
-      <p className="text-gray-500 text-xs mt-1">
-        Клацніть на карті, щоб вибрати координати
-      </p>
     </div>
   );
 };

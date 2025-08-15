@@ -20,7 +20,12 @@ export const useMapData = (year: number): MapData => {
   const bbox = "44,22,52,40"; // Ukraine bbox
   const ohmUrl = `/api/ohm/borders?date=${encodeURIComponent(date)}&bbox=${encodeURIComponent(bbox)}`;
 
-  const { data: ohmData } = useSWR<OverpassResponse>(ohmUrl, fetcher);
+  const { data: ohmData } = useSWR<OverpassResponse>(ohmUrl, fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    refreshWhenHidden: false,
+    refreshWhenOffline: false,
+  });
 
   // Fetch historical states data (only for 1897)
   const statesUrl = year === 1897 ? RI_DISTRICTS_1897 : null;
