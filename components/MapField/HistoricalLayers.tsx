@@ -1,172 +1,177 @@
-import { Layer } from "leaflet";
-import { useCallback, useState } from "react";
-import { GeoJSON } from "react-leaflet";
+import { Layer, LeafletMouseEvent } from "leaflet";
+import {
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { GeoJSON, GeoJSONProps, useMap } from "react-leaflet";
 import { Card, CardBody } from "@heroui/card";
+import booleanPointInPolygon from "@turf/boolean-point-in-polygon";
+import { point as turfPoint } from "@turf/helpers";
 
 import { useMapData } from "./useMapData";
+
+// Color palette for countries (OHM data)
+const colorPalette = [
+  "red",
+  "orange",
+  "yellow",
+  "green",
+  "blue",
+  "darkblue",
+  "purple",
+];
+
+// Function to get color for a country feature
+const getFeatureColor = (feature: any) => {
+  const colorIndex = (feature.id || 0) % colorPalette.length;
+
+  return colorPalette[colorIndex];
+};
+
+// Styles for countries (OHM data)
+const countryDefaultStyle = (feature: any) => ({
+  color: getFeatureColor(feature),
+  weight: 2,
+  fillColor: "transparent",
+  opacity: 0.4,
+  interactive: true,
+});
+
+const countryHighlightStyle = (feature: any) => ({
+  ...countryDefaultStyle(feature),
+  opacity: 0.8,
+});
+
+// Styles for states (historical data)
+const stateDefaultStyle = {
+  color: "gold",
+  weight: 1,
+  fillOpacity: 0,
+  fillColor: "gold",
+  interactive: true,
+};
+
+const stateHighlightStyle = {
+  ...stateDefaultStyle,
+  fillOpacity: 0.8,
+};
+
+const CountriesLayer = memo(
+  forwardRef<L.GeoJSON, GeoJSONProps>(({ data, onEachFeature }, ref) =>
+    data ? (
+      <GeoJSON
+        ref={ref}
+        data={data}
+        style={countryDefaultStyle}
+        onEachFeature={onEachFeature}
+      />
+    ) : null,
+  ),
+);
+
+CountriesLayer.displayName = "CountriesLayer";
+
+const StatesLayer = memo(({ data, onEachFeature }: GeoJSONProps) =>
+  data ? (
+    <GeoJSON
+      data={data}
+      style={stateDefaultStyle}
+      onEachFeature={onEachFeature}
+    />
+  ) : null,
+);
+
+StatesLayer.displayName = "StatesLayer";
 
 interface HistoricalLayersProps {
   year: number;
 }
 
 const HistoricalLayers: React.FC<HistoricalLayersProps> = ({ year }) => {
-  const [hoveredFeature, setHoveredFeature] = useState<any>(null);
+  const [hoveredCountryFeature, setHoveredCountryFeature] = useState<any>(null);
+  const [hoveredStateFeature, setHoveredStateFeature] = useState<any>(null);
   const { countries, states } = useMapData(year);
+  const countriesRef = useRef<L.GeoJSON>(null);
+  const map = useMap();
 
-  // Import L from leaflet
-  const L = require("leaflet");
+  useEffect(() => {
+    if (!map || !countriesRef.current) return;
 
-  // Color palette for countries (OHM data)
-  const colorPalette = [
-    "red",
-    "orange",
-    "yellow",
-    "green",
-    "blue",
-    "darkblue",
-    "purple",
-  ];
+    const handleMouseMove = (e: LeafletMouseEvent) => {
+      const point = turfPoint([e.latlng.lng, e.latlng.lat]);
 
-  // Function to get color for a country feature
-  const getFeatureColor = (feature: any) => {
-    const colorIndex = (feature.id || 0) % colorPalette.length;
+      countriesRef.current?.eachLayer((l: any) => {
+        const feature: GeoJSON.Feature = l.feature;
 
-    return colorPalette[colorIndex];
-  };
+        if (!feature || !feature.geometry) return;
+        try {
+          if (feature.geometry.type.endsWith("Polygon")) {
+            if (booleanPointInPolygon(point, feature as any)) {
+              setHoveredCountryFeature(feature);
+              l.setStyle(countryHighlightStyle(feature));
+            } else {
+              l.setStyle(countryDefaultStyle(feature));
+            }
+          }
+        } catch {
+          console.error("Invalid geometry for feature:", feature.id);
+        }
+      });
+    };
 
-  // Styles for countries (OHM data)
-  const countryDefaultStyle = (feature: any) => ({
-    color: getFeatureColor(feature),
-    weight: 2,
-    fillColor: "transparent",
-    opacity: 0.4,
-    interactive: true,
-  });
+    map.on("mousemove", handleMouseMove);
 
-  const countryHighlightStyle = (feature: any) => ({
-    ...countryDefaultStyle(feature),
-    opacity: 0.8,
-  });
+    return () => {
+      map.off("mousemove", handleMouseMove);
+    };
+  }, [map]);
 
-  // Styles for states (historical data)
-  const stateDefaultStyle = {
-    color: "gold",
-    weight: 1,
-    fillOpacity: 0,
-    fillColor: "gold",
-    interactive: true,
-  };
-
-  const stateHighlightStyle = {
-    ...stateDefaultStyle,
-    fillOpacity: 0.8,
-  };
-
-  const onEachFeature = useCallback(
-    (feature: GeoJSON.Feature<any, any>, layer: Layer) => {
+  const onEachStateFeature = useCallback(
+    (feature: GeoJSON.Feature, layer: Layer) => {
       layer.on({
         mouseover: (e) => {
-          setHoveredFeature(feature);
+          setHoveredStateFeature(feature);
           e.target.setStyle(stateHighlightStyle);
-          if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-            e.target.bringToFront();
-          }
         },
-        mouseout: function (e) {
-          setHoveredFeature(null);
+        mouseout: (e) => {
+          setHoveredStateFeature(null);
           e.target.setStyle(stateDefaultStyle);
-          e.target.closeTooltip();
-        },
-        mousedown: function (e) {
-          // Prevent the default drag selection
-          e.originalEvent.preventDefault();
-          e.target.closeTooltip();
         },
       });
     },
-    [L.Browser.ie, L.Browser.opera, L.Browser.edge],
-  );
-
-  const onEachCountryFeature = useCallback(
-    (feature: GeoJSON.Feature<any, any>, layer: Layer) => {
-      // Try to get a name property, fallback to showing all properties
-      const name =
-        feature.properties?.name ||
-        feature.properties?.NAME ||
-        feature.properties?.Name ||
-        Object.values(feature.properties || {}).join(", ") ||
-        "No name";
-
-      layer.bindTooltip(name, { sticky: true });
-
-      layer.on({
-        mouseover: function (e: any) {
-          setHoveredFeature(feature);
-          e.target.setStyle(countryHighlightStyle(feature));
-          e.target.openTooltip();
-          if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-            e.target.bringToFront();
-          }
-        },
-        mouseout: function (e: any) {
-          setHoveredFeature(null);
-          e.target.setStyle(countryDefaultStyle(feature));
-          e.target.closeTooltip();
-        },
-        mousedown: function (e: any) {
-          // Prevent the default drag selection
-          e.originalEvent.preventDefault();
-        },
-      });
-    },
-    [L.Browser.ie, L.Browser.opera, L.Browser.edge],
+    [],
   );
 
   return (
     <>
-      {/* Render countries from OHM */}
-      {countries && (
-        <GeoJSON
-          data={countries}
-          pane="overlayPane"
-          style={countryDefaultStyle}
-          onEachFeature={onEachCountryFeature}
-        />
-      )}
+      {countries && <CountriesLayer ref={countriesRef} data={countries} />}
 
-      {/* Render states (only for 1897) */}
       {states && (
-        <GeoJSON
-          data={states}
-          pane="shadowPane"
-          style={stateDefaultStyle}
-          onEachFeature={onEachFeature}
-        />
+        <StatesLayer data={states} onEachFeature={onEachStateFeature} />
       )}
 
       {/* Fixed tooltip at bottom left corner */}
-      {hoveredFeature && (
+      {(hoveredCountryFeature || hoveredStateFeature) && (
         <Card className="max-w-sm absolute z-[1000] bottom-[20] left-[20] pointer-events-none">
           <CardBody>
             <div className="flex flex-col gap-1">
-              <h4 className="font-semibold text-large">
-                {hoveredFeature.properties?.Name_RU
-                  ? `${hoveredFeature.properties.Name_RU} уезд`
-                  : hoveredFeature.properties?.name ||
-                    hoveredFeature.properties?.NAME ||
-                    hoveredFeature.properties?.Name ||
-                    "Unknown"}
-              </h4>
-              <p className="text-small text-default-500">
-                {hoveredFeature.properties?.prov_RU ||
-                  hoveredFeature.properties?.admin_level ||
-                  "No additional info"}
-              </p>
-              {hoveredFeature.properties?.Distr_ID && (
-                <p className="text-small text-default-400">
-                  District ID: {hoveredFeature.properties.Distr_ID}
+              {hoveredStateFeature?.properties?.Name_RU && (
+                <h4 className="font-semibold text-large">
+                  {hoveredStateFeature.properties.Name_RU} уезд
+                </h4>
+              )}
+              {hoveredStateFeature?.properties?.prov_RU && (
+                <p className="text-small text-default-500">
+                  {hoveredStateFeature.properties.prov_RU}
                 </p>
               )}
+              <p className="text-small text-default-500">
+                {hoveredCountryFeature?.properties?.name}
+              </p>
             </div>
           </CardBody>
         </Card>

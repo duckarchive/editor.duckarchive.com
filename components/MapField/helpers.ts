@@ -120,27 +120,13 @@ export const orderWaysIntoRings = (
   return orderedWays;
 };
 
-export interface OverpassResponse {
-  elements: Array<{
-    type: string;
-    id: number;
-    lat?: number;
-    lon?: number;
-  }>;
-  generator?: string;
-  osm3s?: {
-    timestamp_osm_base: string;
-    copyright: string;
-  };
-  version?: string;
-}
-
-export const overpass2geojson = (data: OverpassResponse) => {
-  console.log(data.elements.length);
+export const overpass2geojson = (
+  data: OverpassResponse,
+): GeoJSON.FeatureCollection => {
   // Overpass JSON → GeoJSON FeatureCollection helper
   const features = (data.elements || [])
-    .filter((e: any) => e.type === "relation")
-    .map((relation: any) => {
+    .filter((el) => el.type === "relation")
+    .map((relation) => {
       try {
         // Create a lookup for ways by their ID
         const waysById = new Map();
@@ -215,7 +201,7 @@ export const overpass2geojson = (data: OverpassResponse) => {
         return null;
       }
     })
-    .filter((feature: any) => feature !== null);
+    .filter((feature: any) => feature !== null) as GeoJSON.Feature[];
 
   return { type: "FeatureCollection", features };
 };
