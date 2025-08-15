@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
 
 import LocationMarker from "./LocationMarker";
 import MapLocationSearch from "./MapLocationSearch";
 
-import OHMLayer from "@/components/MapField/OHMLayer";
 import HistoricalLayers from "@/components/MapField/HistoricalLayers";
 
 interface MapProps {
@@ -13,25 +12,46 @@ interface MapProps {
 }
 
 const Map: React.FC<MapProps> = ({ position, onPositionChange }) => {
+  const [year, setYear] = useState(1897);
+
+  const handleYearChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newYear = parseInt(event.target.value);
+
+    setYear(newYear);
+  };
+
   return (
-    <MapContainer
-      scrollWheelZoom
-      worldCopyJump
-      center={[49.8397, 24.0297]}
-      style={{ height: "100%", width: "100%" }}
-      zoom={6}
-    >
-      <MapLocationSearch />
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png"
-        // url="https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_only_labels/{z}/{x}/{y}.png"
-        // url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <OHMLayer bbox="43,13,55,41" date="1900-01-01" />
-      <HistoricalLayers />
-      <LocationMarker value={position} onChange={onPositionChange} />
-    </MapContainer>
+    <div>
+      <MapContainer
+        scrollWheelZoom
+        worldCopyJump
+        center={[49.8397, 24.0297]}
+        style={{ height: "500px", width: "100%" }}
+        zoom={6}
+      >
+        <MapLocationSearch />
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png"
+        />
+        <HistoricalLayers year={year} />
+        <LocationMarker value={position} onChange={onPositionChange} />
+      </MapContainer>
+
+      {/* Date filtering controls extracted from HistoricalMap */}
+      <div className="flex items-center gap-2 mt-2">
+        <label htmlFor="date-slider">Year: </label>
+        <input
+          id="date-slider"
+          max={2025}
+          min={1600}
+          type="range"
+          value={year}
+          onChange={handleYearChange}
+        />
+        <span>{year}</span>
+      </div>
+    </div>
   );
 };
 
