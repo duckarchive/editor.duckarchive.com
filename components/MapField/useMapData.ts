@@ -1,55 +1,67 @@
 import useSWR from "swr";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
-import { overpass2geojson } from "./helpers";
+import { overpass2geojson, response2geojson } from "./helpers";
 
 interface MapData {
   countries: GeoJSON.FeatureCollection | null;
   states: GeoJSON.FeatureCollection | null;
+  updateYear: (year: number) => void;
+  isLoading: boolean;
 }
 
-const RI_DISTRICTS_1897 =
-  "https://raw.githubusercontent.com/bnotezz/ua-settlements/main/assets/maps/old_maps/ri/ri_districts_1897.geojson";
+const YEAR_TO_STATE_URL: Record<number, string> = {
+  1897: "https://raw.githubusercontent.com/bnotezz/ua-settlements/main/assets/maps/old_maps/ri/ri_districts_1897.geojson",
+};
 
 // Fetcher function for SWR
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export const useMapData = (year: number): MapData => {
+export const useMapData = (defaultYear: number): MapData => {
+  const [year, setYear] = useState(defaultYear);
   // Fetch OHM countries data
   const date = `${year}-01-01`;
   const bbox = "44,22,52,40"; // Ukraine bbox
   const ohmUrl = `/api/ohm/borders?date=${encodeURIComponent(date)}&bbox=${encodeURIComponent(bbox)}`;
 
-  const { data: ohmData } = useSWR<OverpassResponse>(ohmUrl, fetcher, {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-    refreshWhenHidden: false,
-    refreshWhenOffline: false,
-  });
-
-  // Fetch historical states data (only for 1897)
-  const statesUrl = year === 1897 ? RI_DISTRICTS_1897 : null;
-  const { data: statesData } = useSWR<GeoJSON.FeatureCollection>(
-    statesUrl,
+  const { data: ohmData, isLoading: isLoadingOhm } = useSWR<OverpassResponse>(
+    ohmUrl,
     fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshWhenHidden: false,
+      refreshWhenOffline: false,
+    },
   );
+
+  const statesUrl = YEAR_TO_STATE_URL[year] || null;
+  const { data: statesData, isLoading: isLoadingStates } =
+    useSWR<GeoJSON.FeatureCollection>(statesUrl, fetcher, {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshWhenHidden: false,
+      refreshWhenOffline: false,
+    });
 
   const countries = useMemo(
     () => (ohmData ? overpass2geojson(ohmData) : null),
     [ohmData],
   );
 
-  const states = useMemo(() => {
-    if (!statesData) return null;
+  const states = useMemo(
+    () => (statesData ? response2geojson(statesData) : null),
+    [statesData],
+  );
 
-    return {
-      ...statesData,
-      features: statesData.features.map((feature) => ({
-        ...feature,
-        id: `${feature.properties?.Gub_ID}_${feature.properties?.Distr_ID}`,
-      })),
-    };
-  }, [statesData]);
+  const updateYear = (year: number) => {
+    setYear(year);
+  };
 
-  return { countries, states };
+  return {
+    countries,
+    states,
+    updateYear,
+    isLoading: isLoadingOhm || isLoadingStates,
+  };
 };

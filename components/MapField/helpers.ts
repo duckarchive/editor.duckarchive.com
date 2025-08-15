@@ -205,3 +205,17 @@ export const overpass2geojson = (
 
   return { type: "FeatureCollection", features };
 };
+
+export const response2geojson = (
+  data: GeoJSON.FeatureCollection | null,
+): GeoJSON.FeatureCollection => {
+  if (!data) return { type: "FeatureCollection", features: [] };
+
+  return {
+    ...data,
+    features: data.features.map((feature) => ({
+      ...feature,
+      id: `${feature.properties?.Gub_ID}_${feature.properties?.Distr_ID}`,
+    })),
+  };
+};
