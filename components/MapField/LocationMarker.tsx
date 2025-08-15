@@ -7,13 +7,12 @@ interface LocationMarkerProps {
 }
 
 const LocationMarker: React.FC<LocationMarkerProps> = ({ value, onChange }) => {
-  const map = useMapEvents({
+  useMapEvents({
     click(e: any) {
       if (!e.latlng) return;
       const { lat, lng } = e.latlng;
 
       onChange([lat, lng]);
-      map.flyTo(e.latlng, map.getZoom());
     },
   });
 
