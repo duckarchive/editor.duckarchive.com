@@ -11,7 +11,7 @@ interface MapData {
 }
 
 const YEAR_TO_STATE_URL: Record<number, string> = {
-  1897: "https://raw.githubusercontent.com/bnotezz/ua-settlements/main/assets/maps/old_maps/ri/ri_districts_1897.geojson",
+  1897: "https://raw.githubusercontent.com/duckarchive/map.duckarchive.com/refs/heads/main/public/assets/geojson/1897.geojson",
 };
 
 // Fetcher function for SWR
