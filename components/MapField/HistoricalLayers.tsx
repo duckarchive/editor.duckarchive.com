@@ -23,8 +23,9 @@ import useStopPropagation from "@/components/MapField/useStopPropagation";
 const YEAR_PRESETS = [
   { value: 1897, label: "Російська Імперія" },
   { value: 1914, label: "WWI" },
-  { value: 1939, label: "WWII" },
-  { value: 1991, label: "Розпад СРСР" },
+  { value: 1937, label: "Перед WWII" },
+  { value: 1945, label: "Після WWII" },
+  { value: 1991, label: "Незалежність" },
 ];
 
 // Color palette for countries (OHM data)
@@ -237,14 +238,14 @@ const HistoricalLayers: React.FC<HistoricalLayersProps> = ({ year = 1897 }) => {
         >
           <CardBody>
             <div className="flex flex-col gap-1">
-              {hoveredStateFeature?.properties?.district && (
+              {hoveredStateFeature?.properties?.admin_level_2 && (
                 <h4 className="font-semibold text-large">
-                  {hoveredStateFeature.properties.district}
+                  {hoveredStateFeature.properties.admin_level_2}
                 </h4>
               )}
-              {hoveredStateFeature?.properties?.state && (
+              {hoveredStateFeature?.properties?.admin_level_1 && (
                 <p className="text-small text-default-500">
-                  {hoveredStateFeature.properties.state}
+                  {hoveredStateFeature.properties.admin_level_1}
                 </p>
               )}
               <p className="text-small text-default-500">

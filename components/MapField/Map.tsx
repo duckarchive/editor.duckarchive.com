@@ -5,6 +5,7 @@ import LocationMarker from "./LocationMarker";
 import MapLocationSearch from "./MapLocationSearch";
 
 import HistoricalLayers from "@/components/MapField/HistoricalLayers";
+import UkraineLayer from "@/components/MapField/UkraineLayer";
 
 interface MapProps {
   position: [number, number];
@@ -25,6 +26,7 @@ const Map: React.FC<MapProps> = ({ position, onPositionChange }) => (
       attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       url="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}.png"
     />
+    <UkraineLayer />
     <HistoricalLayers />
     <LocationMarker value={position} onChange={onPositionChange} />
   </MapContainer>
