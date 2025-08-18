@@ -3,13 +3,16 @@
 import { useEffect, useState } from "react";
 import { Card, CardBody } from "@heroui/card";
 import { Input } from "@heroui/input";
-
-import Map from "./Map";
+import dynamic from "next/dynamic";
 
 import "leaflet/dist/leaflet.css";
-import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
-import "leaflet-geosearch/assets/css/leaflet.css";
-import "leaflet-defaulticon-compatibility";
+
+const GeoDuckMap = dynamic(
+  () => import("@duckarchive/map").then((mod) => mod.default),
+  {
+    ssr: false,
+  },
+);
 
 interface MapInputProps {
   lat?: number;
@@ -147,7 +150,10 @@ const MapInput: React.FC<MapInputProps> = ({
       <Card>
         <CardBody className="p-0">
           <div className="h-[500px] w-full">
-            <Map position={position} onPositionChange={handlePositionChange} />
+            <GeoDuckMap
+              position={position}
+              onPositionChange={handlePositionChange}
+            />
           </div>
         </CardBody>
       </Card>
