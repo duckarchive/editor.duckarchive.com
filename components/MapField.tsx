@@ -6,6 +6,7 @@ import { Input } from "@heroui/input";
 import dynamic from "next/dynamic";
 
 import "leaflet/dist/leaflet.css";
+import "../node_modules/@duckarchive/map/dist/style.css";
 
 const GeoDuckMap = dynamic(
   () => import("@duckarchive/map").then((mod) => mod.default),
