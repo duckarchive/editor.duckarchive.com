@@ -16,6 +16,12 @@ export const buildWhereClause = (searchParams: URLSearchParams | string) => {
         if (!filterValue) return;
 
         switch (filterType) {
+          case "blank":
+            where[fieldName] = null;
+            break;
+          case "notBlank":
+            where[fieldName] = { not: null };
+            break;
           case "equals":
             where[fieldName] = filterValue;
             break;
@@ -84,7 +90,7 @@ export const buildQueryString = (filters: Record<string, any>): string => {
     {
       encode: false,
       arrayFormat: "brackets",
-    }
+    },
   );
 
   return query ? `?${query}` : "";

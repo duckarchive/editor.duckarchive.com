@@ -6,6 +6,7 @@ import { useState, useCallback } from "react";
 import { useAdmin } from "@/hooks/useAdmin";
 import AdminTable from "@/components/admin-table";
 import AdminPanel from "@/components/admin-panel";
+import { diff } from "@/lib/algorithm";
 
 interface AdminViewProps {
   prefix: string;
@@ -38,6 +39,10 @@ const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
     setActiveItem(undefined);
   };
 
+  const handleSaveActiveItem = (values: BaseInstance) => {
+    update(values.id, diff(values, activeItem || {}));
+  };
+
   if (error) {
     return <div>Error: {error.message}</div>;
   }
@@ -48,6 +53,7 @@ const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
         activeItem={activeItem}
         items={selectedItems}
         onClose={handleResetActiveItem}
+        onSave={handleSaveActiveItem}
       />
       <AdminTable
         columns={columns}

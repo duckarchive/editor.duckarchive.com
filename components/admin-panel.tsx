@@ -17,7 +17,7 @@ interface AdminPanelProps {
   items: Array<BaseInstance>;
   activeItem?: BaseInstance;
   onClose?: () => void;
-  onSave?: (values: Record<string, any>) => void;
+  onSave?: (values: BaseInstance) => void;
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({
@@ -40,7 +40,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     onClose();
   };
 
-  const handleFormSubmit = async (values: Record<string, any>) => {
+  const handleFormSubmit = async (values: BaseInstance) => {
     setIsLoading(true);
     try {
       await onSave?.(values);

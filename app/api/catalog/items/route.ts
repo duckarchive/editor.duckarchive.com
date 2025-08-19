@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       { error: "Failed to fetch items" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

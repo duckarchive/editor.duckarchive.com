@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { duckkeyPrisma } from "@/lib/db";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<BaseInstance> },
 ) {
   try {
     const { id } = await params;
@@ -28,16 +29,17 @@ export async function GET(
     return NextResponse.json(user);
   } catch (error) {
     console.error("GET User Error:", error);
+
     return NextResponse.json(
       { error: "Failed to fetch user" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<BaseInstance> },
 ) {
   try {
     const { id } = await params;
@@ -56,16 +58,17 @@ export async function PATCH(
     return NextResponse.json(updatedUser);
   } catch (error) {
     console.error("PATCH User Error:", error);
+
     return NextResponse.json(
       { error: "Failed to update user" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<BaseInstance> },
 ) {
   try {
     const { id } = await params;
@@ -77,9 +80,10 @@ export async function DELETE(
     return NextResponse.json({ message: "User deleted successfully" });
   } catch (error) {
     console.error("DELETE User Error:", error);
+
     return NextResponse.json(
       { error: "Failed to delete user" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

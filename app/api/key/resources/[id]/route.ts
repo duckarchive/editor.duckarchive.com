@@ -1,19 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { duckkeyPrisma } from '@/lib/db';
+import { NextRequest, NextResponse } from "next/server";
+
+import { duckkeyPrisma } from "@/lib/db";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<BaseInstance> },
 ) {
   try {
     const { id } = await params;
-    
+
     const resource = await duckkeyPrisma.resource.findUnique({
       where: { id },
       include: {
         persons: {
           take: 10,
-          orderBy: { created_at: 'desc' },
+          orderBy: { created_at: "desc" },
         },
         _count: {
           select: { persons: true },
@@ -23,24 +24,25 @@ export async function GET(
 
     if (!resource) {
       return NextResponse.json(
-        { error: 'Resource not found' },
-        { status: 404 }
+        { error: "Resource not found" },
+        { status: 404 },
       );
     }
 
     return NextResponse.json(resource);
   } catch (error) {
-    console.error('GET Resource Error:', error);
+    console.error("GET Resource Error:", error);
+
     return NextResponse.json(
-      { error: 'Failed to fetch resource' },
-      { status: 500 }
+      { error: "Failed to fetch resource" },
+      { status: 500 },
     );
   }
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<BaseInstance> },
 ) {
   try {
     const { id } = await params;
@@ -58,17 +60,18 @@ export async function PATCH(
 
     return NextResponse.json(updatedResource);
   } catch (error) {
-    console.error('PATCH Resource Error:', error);
+    console.error("PATCH Resource Error:", error);
+
     return NextResponse.json(
-      { error: 'Failed to update resource' },
-      { status: 500 }
+      { error: "Failed to update resource" },
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<BaseInstance> },
 ) {
   try {
     const { id } = await params;
@@ -77,12 +80,13 @@ export async function DELETE(
       where: { id },
     });
 
-    return NextResponse.json({ message: 'Resource deleted successfully' });
+    return NextResponse.json({ message: "Resource deleted successfully" });
   } catch (error) {
-    console.error('DELETE Resource Error:', error);
+    console.error("DELETE Resource Error:", error);
+
     return NextResponse.json(
-      { error: 'Failed to delete resource' },
-      { status: 500 }
+      { error: "Failed to delete resource" },
+      { status: 500 },
     );
   }
 }

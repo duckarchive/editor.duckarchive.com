@@ -153,6 +153,7 @@ const MapInput: React.FC<MapInputProps> = ({
           <div className="h-[500px] w-full">
             <GeoDuckMap
               position={position}
+              scrollWheelZoom={false}
               onPositionChange={handlePositionChange}
             />
           </div>
