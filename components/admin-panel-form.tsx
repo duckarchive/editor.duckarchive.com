@@ -8,6 +8,7 @@ import { Select, SelectItem } from "@heroui/select";
 import { Switch } from "@heroui/switch";
 
 import MapField from "@/components/MapField";
+import { HIDDEN_FIELDS, READONLY_FIELDS } from "@/lib/fields";
 
 interface FormValues extends BaseInstance {
   [key: string]: any;
@@ -129,7 +130,9 @@ const AdminPanelForm: React.FC<AdminPanelFormProps> = ({
 
   // Generate field configurations based on defaultValues
   const fieldConfigs: FieldConfig[] = Object.entries(defaultValues)
-    .filter(([key]) => key !== "id") // Exclude ID field from editing
+    .filter(
+      ([key]) => !HIDDEN_FIELDS.includes(key) && !READONLY_FIELDS.includes(key),
+    ) // Exclude ID field from editing
     .map(([key, value]) => ({
       key,
       type: getFieldType(key, value),
@@ -298,6 +301,10 @@ const AdminPanelForm: React.FC<AdminPanelFormProps> = ({
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
+      {/* Other fields */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {otherFields.map(renderField)}
+      </div>
       {/* Coordinate fields grouped together */}
       {coordinateFields.length >= 2 && (
         <div className="space-y-2">
@@ -313,11 +320,6 @@ const AdminPanelForm: React.FC<AdminPanelFormProps> = ({
           {coordinateFields.length > 2 && <Divider />}
         </div>
       )}
-
-      {/* Other fields */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {otherFields.map(renderField)}
-      </div>
 
       {/* Form actions */}
       <div className="flex justify-end gap-2 pt-4">

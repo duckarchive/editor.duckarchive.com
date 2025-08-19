@@ -4,9 +4,7 @@ import catalog from "@/generated/prisma/catalog-client/runtime/library";
 import duckarchive from "@/generated/prisma/duckarchive-client/runtime/library";
 import duckkey from "@/generated/prisma/duckkey-client/runtime/library";
 import inspector from "@/generated/prisma/inspector-client/runtime/library";
-
-const READONLY_FIELDS: string[] = [];
-const HIDDEN_FIELDS: string[] = ["id"];
+import { HIDDEN_FIELDS, READONLY_FIELDS } from "@/lib/fields";
 
 type BaseDMMF =
   | catalog.BaseDMMF
