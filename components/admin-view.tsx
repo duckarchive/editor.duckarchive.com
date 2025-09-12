@@ -28,7 +28,7 @@ const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
     isDeleting,
   } = useAdmin<BaseInstance>(prefix, { filters });
 
-  const [selectedItems, setSelectedItems] = useState<BaseInstance[]>([]);
+  // const [selectedItems, setSelectedItems] = useState<BaseInstance[]>([]);
   const [activeItem, setActiveItem] = useState<BaseInstance>();
 
   const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
@@ -51,7 +51,6 @@ const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
     <div className="h-full flex flex-col">
       <AdminPanel
         activeItem={activeItem}
-        items={selectedItems}
         onClose={handleResetActiveItem}
         onSave={handleSaveActiveItem}
       />
@@ -61,7 +60,6 @@ const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
         rows={data || []}
         onFilterChanged={handleFilterChange}
         onRowClick={setActiveItem}
-        onSelectionChanged={setSelectedItems}
       />
     </div>
   );

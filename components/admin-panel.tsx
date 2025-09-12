@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@heroui/button";
 import {
   ModalContent,
   Modal,
@@ -8,20 +7,18 @@ import {
   ModalBody,
   useDisclosure,
 } from "@heroui/modal";
-import { IoSettings } from "react-icons/io5";
 import { useEffect, useState } from "react";
 
 import AdminPanelForm from "./admin-panel-form";
 
 interface AdminPanelProps {
-  items: Array<BaseInstance>;
+  // items: Array<BaseInstance>;
   activeItem?: BaseInstance;
   onClose?: () => void;
   onSave?: (values: BaseInstance) => void;
 }
 
 const AdminPanel: React.FC<AdminPanelProps> = ({
-  items,
   activeItem,
   onClose: onCloseProp,
   onSave,
@@ -52,13 +49,9 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
     }
   };
 
-  // Get default values from active item or first selected item
-  const defaultValues =
-    activeItem || (items.length > 0 ? items[0] : { id: "" });
-
   return (
     <>
-      <Button
+      {/* <Button
         className="mb-4"
         color="primary"
         isDisabled={items.length === 0}
@@ -67,31 +60,29 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
         onPress={onOpen}
       >
         Масове редагування ({items.length})
-      </Button>
+      </Button> */}
 
       <Modal
         backdrop="blur"
-        isOpen={isOpen}
+        isOpen={isOpen && Boolean(activeItem)}
         scrollBehavior="inside"
         size="4xl"
         onClose={handleCloseModal}
       >
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
-            <h3 className="text-lg font-semibold">
-              {activeItem
-                ? `Редагування запису`
-                : `Масове редагування (${items.length} записів)`}
-            </h3>
+            <h3 className="text-lg font-semibold">Редагування запису</h3>
           </ModalHeader>
 
           <ModalBody>
-            <AdminPanelForm
-              defaultValues={defaultValues}
-              isLoading={isLoading}
-              onCancel={handleCloseModal}
-              onSubmit={handleFormSubmit}
-            />
+            {activeItem && (
+              <AdminPanelForm
+                defaultValues={activeItem}
+                isLoading={isLoading}
+                onCancel={handleCloseModal}
+                onSubmit={handleFormSubmit}
+              />
+            )}
           </ModalBody>
         </ModalContent>
       </Modal>
