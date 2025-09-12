@@ -40,7 +40,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   const handleFormSubmit = async (values: BaseInstance) => {
     setIsLoading(true);
     try {
-      await onSave?.(values);
+      onSave?.(values);
       handleCloseModal();
     } catch {
       // Handle error silently or show notification

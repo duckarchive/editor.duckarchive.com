@@ -24,3 +24,26 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export async function PATCH(
+  request: NextRequest,
+) {
+  try {
+    const { ids, item } = await request.json();
+
+    await catalogPrisma.item.updateMany({
+      where: { id: { in: ids } },
+      data: item,
+    });
+
+    return NextResponse.json(ids.length);
+  } catch (error) {
+    console.error("PATCH Resource Error:", error);
+
+    return NextResponse.json(
+      { error: "Failed to update resource" },
+      { status: 500 },
+    );
+  }
+}
+

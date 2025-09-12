@@ -21,6 +21,7 @@ const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
     isLoading,
     create,
     update,
+    similar,
     delete: deleteItem,
     refresh,
     isCreating,
@@ -39,8 +40,12 @@ const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
     setActiveItem(undefined);
   };
 
-  const handleSaveActiveItem = (values: BaseInstance) => {
-    update(values.id, diff(values, activeItem || {}));
+  const handleSaveActiveItem = async (values: BaseInstance) => {
+    const itemsToUpdate = await similar(values.id, diff(values, activeItem || {}));
+    const res = confirm(`Підтвердіть оновлення ${itemsToUpdate.length} елементів`);
+    if (res) {
+      await update(itemsToUpdate.map(item => item.id), diff(values, activeItem || {}));
+    }
   };
 
   if (error) {
