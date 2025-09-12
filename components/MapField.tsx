@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Card, CardBody } from "@heroui/card";
-import { Input } from "@heroui/input";
 import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
+import { Input } from "@heroui/input";
+import { Accordion, AccordionItem } from "@heroui/accordion";
+import { Button } from "@heroui/button";
+import { IoMap } from "react-icons/io5";
+import { useDisclosure } from "@heroui/modal";
 
 import "leaflet/dist/leaflet.css";
 import "../node_modules/@duckarchive/map/dist/style.css";
@@ -39,11 +42,7 @@ const MapInput: React.FC<MapInputProps> = ({
   errorMessage,
 }) => {
   const [position, setPosition] = useState<[number, number]>([lat, lng]);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const { isOpen, onOpenChange } = useDisclosure();
 
   useEffect(() => {
     if (lat && lng) {
@@ -82,50 +81,14 @@ const MapInput: React.FC<MapInputProps> = ({
     }
   };
 
-  if (!mounted) {
-    return (
-      <div className="w-full">
-        <div className="flex gap-2 mb-2">
-          <Input
-            isInvalid={isInvalid}
-            isRequired={isRequired}
-            label="Широта"
-            step="any"
-            type="number"
-            value={lat ? lat.toString() : ""}
-          />
-          <Input
-            isInvalid={isInvalid}
-            isRequired={isRequired}
-            label="Довгота"
-            step="any"
-            type="number"
-            value={lng ? lng.toString() : ""}
-          />
-        </div>
-        <Card>
-          <CardBody>
-            <div className="h-64 flex items-center justify-center bg-gray-100 rounded">
-              <p className="text-gray-500">Завантаження карти...</p>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="w-full">
       <label className="block text-sm font-medium mb-2">
         {label}
         {isRequired && <span className="text-red-500 ml-1">*</span>}
-
-        <p className="text-gray-500 text-xs mt-1">
-          Клацніть на карті, щоб вибрати координати
-        </p>
       </label>
 
-      <div className="flex gap-2 mb-2">
+      <div className="flex gap-2">
         <Input
           isInvalid={isInvalid}
           isRequired={isRequired}
@@ -146,19 +109,40 @@ const MapInput: React.FC<MapInputProps> = ({
           value={position?.[1]?.toString() || ""}
           onValueChange={handleLngInputChange}
         />
+        <Button
+          aria-label="Open map to select location"
+          className="h-auto"
+          variant={isOpen ? "flat" : "bordered"}
+          onPress={onOpenChange}
+        >
+          <IoMap size={20} />
+        </Button>
       </div>
 
-      <Card>
-        <CardBody className="p-0">
-          <div className="h-[500px] w-full">
-            <GeoDuckMap
-              position={position}
-              scrollWheelZoom={false}
-              onPositionChange={handlePositionChange}
-            />
-          </div>
-        </CardBody>
-      </Card>
+      <Accordion
+        isCompact
+        className="p-0"
+        selectedKeys={isOpen ? ["map-help"] : []}
+        variant="light"
+      >
+        <AccordionItem
+          key="map-help"
+          aria-label="Open map to select location"
+          classNames={{
+            content: "h-[500px] w-full",
+            title: "text-sm opacity-50",
+            trigger: "p-0",
+          }}
+          indicator={" "}
+          title={null}
+        >
+          <GeoDuckMap
+            position={position}
+            scrollWheelZoom={false}
+            onPositionChange={handlePositionChange}
+          />
+        </AccordionItem>
+      </Accordion>
 
       {isInvalid && errorMessage && (
         <p className="text-red-500 text-sm mt-1">{errorMessage}</p>

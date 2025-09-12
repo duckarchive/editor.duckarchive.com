@@ -14,6 +14,7 @@
     "@duckarchive/framework": "github:duckarchive/framework",
     "@duckarchive/map": "github:duckarchive/map",
     "@duckarchive/prisma": "github:duckarchive/prisma",
+    "@heroui/accordion": "^2.2.23",
     "@heroui/autocomplete": "^2.3.26",
     "@heroui/button": "2.2.21",
     "@heroui/card": "^2.2.23",
