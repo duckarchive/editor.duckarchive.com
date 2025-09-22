@@ -4,14 +4,11 @@ import { catalogPrisma } from "@/lib/db";
 
 const FIELDS = catalogPrisma.item.fields;
 const BATCH_FIELDS = [
-  FIELDS.country.name,
-  FIELDS.state.name,
   FIELDS.place.name,
   FIELDS.lat.name,
   FIELDS.lng.name,
-  FIELDS.church_name.name,
-  FIELDS.church_administration.name,
-  FIELDS.confession.name,
+  FIELDS.author.name,
+  FIELDS.author_administration.name,
 ];
 
 export async function POST(

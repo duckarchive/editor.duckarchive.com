@@ -133,7 +133,7 @@ const MapInput: React.FC<MapInputProps> = ({
             title: "text-sm opacity-50",
             trigger: "p-0",
           }}
-          indicator={" "}
+          hideIndicator
           title={null}
         >
           <GeoDuckMap
