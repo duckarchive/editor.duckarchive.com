@@ -7,8 +7,10 @@ const BATCH_FIELDS = [
   FIELDS.place.name,
   FIELDS.lat.name,
   FIELDS.lng.name,
+  FIELDS.radius_m.name,
   FIELDS.author.name,
   FIELDS.author_administration.name,
+  FIELDS.title.name,
 ];
 
 export async function POST(

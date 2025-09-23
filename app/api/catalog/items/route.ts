@@ -20,20 +20,23 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       { error: "Failed to fetch items" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-) {
+export async function PATCH(request: NextRequest) {
   try {
     const { ids, item } = await request.json();
 
     await catalogPrisma.item.updateMany({
       where: { id: { in: ids } },
-      data: item,
+      data: {
+        ...item,
+        lat: +item.lat,
+        lng: +item.lng,
+        radius_m: +item.radius_m,
+      },
     });
 
     return NextResponse.json(ids.length);
@@ -42,8 +45,7 @@ export async function PATCH(
 
     return NextResponse.json(
       { error: "Failed to update resource" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
-

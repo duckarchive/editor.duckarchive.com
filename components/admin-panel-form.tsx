@@ -7,13 +7,14 @@ import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import { Switch } from "@heroui/switch";
 
-import MapField from "@/components/MapField";
 import { HIDDEN_FIELDS, READONLY_FIELDS } from "@/lib/fields";
+import CoordinatesInput from "@/components/coordinates-input";
 
 interface FormValues extends BaseInstance {
   [key: string]: any;
-  lat?: number | null;
-  lng?: number | null;
+  lat?: string;
+  lng?: string;
+  radius_m?: number;
 }
 
 interface AdminPanelFormProps {
@@ -47,7 +48,7 @@ interface FieldConfig {
 
 const getFieldType = (key: string, value: any): FieldConfig["type"] => {
   // Special handling for coordinates
-  if (key === "lat" || key === "lng") {
+  if (key === "lat" || key === "lng" || key === "radius_m") {
     return "coordinates";
   }
 
@@ -161,6 +162,15 @@ const AdminPanelForm: React.FC<AdminPanelFormProps> = ({
         [key]: "",
       }));
     }
+  };
+
+  const handleCoordinatesChange = (coords: Pick<FormValues, "lat" | "lng" | "radius_m">) => {
+    setFormValues((prev) => ({
+      ...prev,
+      lat: coords.lat,
+      lng: coords.lng,
+      radius_m: coords.radius_m,
+    }));
   };
 
   const validateForm = (): boolean => {
@@ -306,16 +316,16 @@ const AdminPanelForm: React.FC<AdminPanelFormProps> = ({
         {otherFields.map(renderField)}
       </div>
       {/* Coordinate fields grouped together */}
-      {coordinateFields.length >= 2 && (
+      {coordinateFields.length >= 3 && (
         <div className="space-y-2">
-          <MapField
-            errorMessage={errors.lat || errors.lng}
-            isInvalid={!!(errors.lat || errors.lng)}
-            isRequired={coordinateFields.some((f) => f.required)}
-            lat={formValues.lat || undefined}
-            lng={formValues.lng || undefined}
-            onLatChange={(lat) => handleInputChange("lat", lat)}
-            onLngChange={(lng) => handleInputChange("lng", lng)}
+          <CoordinatesInput
+            value={{
+              lat: formValues.lat,
+              lng: formValues.lng,
+              radius_m: formValues.radius_m,
+            }}
+            onChange={handleCoordinatesChange}
+            isLoading={isLoading}
           />
           {coordinateFields.length > 2 && <Divider />}
         </div>
