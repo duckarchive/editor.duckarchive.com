@@ -13,13 +13,6 @@ const projects = [
     description: "Сервіс для пошуку архівних справ за реквізитами.",
     url: "/inspector",
     image: InspectorSrc,
-    isComing: true,
-  },
-  {
-    name: "Каталог",
-    description: "Пошукова система для архівних справ.",
-    url: "/catalog",
-    image: EggSrc,
   },
   {
     name: "Ключ",

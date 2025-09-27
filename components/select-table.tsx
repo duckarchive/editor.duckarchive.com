@@ -20,21 +20,21 @@ const SelectTable: React.FC<SelectTableProps> = ({
     <div>
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">{title}</h1>
-          {description && <p className="text-gray-600">{description}</p>}
+          <h1 className="text-lg md:text-3xl font-bold mb-2">{title}</h1>
+          {description && <p className="text-sm md:text-base text-gray-600">{description}</p>}
         </div>
 
-        <div className="flex gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {items.map(({ table_name }) => (
             <Link key={table_name} href={`${prefix}/${table_name}`}>
-              <Card className="cursor-pointer border-2 border-transparent hover:border-blue-300">
-                <CardBody className="flex-row items-center gap-2">
+              <Card className="cursor-pointer border-2 border-transparent hover:border-blue-300 h-full">
+                <CardBody className="flex-row items-start gap-2">
                   <FaDatabase className="w-12 h-12 text-gray-400" />
                   <div>
                     <h3 className="font-semibold capitalize">
                       {startCase(table_name)}
                     </h3>
-                    <p className="text-sm text-gray-500 mt-1">{table_name}</p>
+                    <p className="text-sm text-gray-500">{table_name}</p>
                   </div>
                 </CardBody>
               </Card>

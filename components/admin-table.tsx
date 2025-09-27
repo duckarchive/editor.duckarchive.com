@@ -35,10 +35,17 @@ const AdminTable: React.FC<AdminTableProps> = memo(
       onRowClick(event.data);
     };
 
+    // move created_at, updated_at to the end
+    const sortedColumns = [
+      ...columns.filter((col) => col.field !== "created_at" && col.field !== "updated_at"),
+      columns.find((col) => col.field === "created_at"),
+      columns.find((col) => col.field === "updated_at"),
+    ].filter(Boolean) as ColDef[];
+
     return (
       <DuckTable<BaseInstance>
         appTheme="light"
-        columns={columns}
+        columns={sortedColumns}
         isLoading={isLoading}
         // rowSelection={{ mode: "multiRow", selectAll: "filtered" }}
         rows={rows}
