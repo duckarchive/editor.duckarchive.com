@@ -10,8 +10,12 @@ import {
 import { useEffect, useState } from "react";
 
 import InspectorPanelForm from "./inspector-panel-form";
+import InspectorCaseForm from "@/app/inspector/cases/form";
+import { Archive, Author } from "@/generated/prisma/inspector-client";
 
 interface InspectorPanelProps {
+  archives: Archive[];
+  authors: Author[];
   // items: Array<BaseInstance>;
   activeItem?: BaseInstance;
   onClose?: () => void;
@@ -19,6 +23,8 @@ interface InspectorPanelProps {
 }
 
 const InspectorPanel: React.FC<InspectorPanelProps> = ({
+  archives,
+  authors,
   activeItem,
   onClose: onCloseProp,
   onSave,
@@ -76,12 +82,20 @@ const InspectorPanel: React.FC<InspectorPanelProps> = ({
 
           <ModalBody>
             {activeItem && (
-              <InspectorPanelForm
+              <InspectorCaseForm
+                archives={archives}
+                authors={authors}
                 defaultValues={activeItem}
                 isLoading={isLoading}
                 onCancel={handleCloseModal}
-                onSubmit={handleFormSubmit}
+                onSubmit={() => {}}
               />
+              // <InspectorPanelForm
+              //   defaultValues={activeItem}
+              //   isLoading={isLoading}
+              //   onCancel={handleCloseModal}
+              //   onSubmit={handleFormSubmit}
+              // />
             )}
           </ModalBody>
         </ModalContent>

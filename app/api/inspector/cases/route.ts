@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
           include: { author: true }
         },
         description: {
-          include: { fund: true }
+          include: { fund: { include: { archive: true } } }
         }
       }
     });

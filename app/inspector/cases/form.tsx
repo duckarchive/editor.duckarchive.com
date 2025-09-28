@@ -1,4 +1,4 @@
-import SelectArchive from "@/components/select-archive";
+import ParentalStructureInput from "@/components/parental-structure-input";
 import { Archive, Author, Prisma } from "@/generated/prisma/inspector-client";
 import { Input } from "@heroui/input";
 import { Key, useState } from "react";
@@ -7,7 +7,11 @@ export type FullCase = Prisma.CaseGetPayload<{
   include: {
     description: {
       include: {
-        fund: true;
+        fund: {
+          include: {
+            archive: true;
+          };
+        };
       };
     };
     authors: {
@@ -40,47 +44,69 @@ const InspectorCaseForm: React.FC<InspectorCaseFormProps> = ({
   const [formValues, setFormValues] = useState<FullCase | undefined>(
     defaultValues as FullCase
   );
-  const handleArchiveChange = (value: Key | null) => {
+  const handleStructureChange = (field: string, value: string) => {
     setFormValues((prev) => {
-      if (!prev || !value) return prev;
-      return {
-        ...prev,
-        description: {
-          ...prev.description,
-          fund: {
-            ...prev.description.fund,
-            archive_id: value.toString(),
-          },
-        },
-      };
+      if (!prev) return prev;
+      
+      switch (field) {
+        case "archive_code":
+          return {
+            ...prev,
+            description: {
+              ...prev.description,
+              fund: {
+                ...prev.description.fund,
+                archive: {
+                  ...prev.description.fund.archive,
+                  code: value,
+                },
+              },
+            },
+          };
+        case "fund_code":
+          return {
+            ...prev,
+            description: {
+              ...prev.description,
+              fund: {
+                ...prev.description.fund,
+                code: value,
+              },
+            },
+          };
+        case "description_code":
+          return {
+            ...prev,
+            description: {
+              ...prev.description,
+              code: value,
+            },
+          };
+        case "case_code":
+          return {
+            ...prev,
+            code: value,
+          };
+        default:
+          return prev;
+      }
     });
   };
 
-  console.log(formValues?.description.fund.archive_id);
-
   return (
     <form onSubmit={onSubmit}>
-      <fieldset title="Реквізити" className="flex gap-2">
-        <SelectArchive
+      <fieldset title="Реквізити">
+        <ParentalStructureInput
           archives={archives}
-          value={formValues?.description.fund.archive_id}
-          onChange={handleArchiveChange}
+          deps={4}
+          values={{
+            archive_code: formValues?.description.fund.archive.code,
+            fund_code: formValues?.description.fund.code,
+            description_code: formValues?.description.code,
+            case_code: formValues?.code,
+          }}
+          onChange={handleStructureChange}
         />
-        {/* <Input
-          label="Фонд"
-          value={searchValues.fund || ""}
-          onChange={handleInputChange("fund")}
-        />
-        <Input
-          label="Опис"
-          value={searchValues.description || ""}
-          onChange={handleInputChange("description")}
-        />
-        <Input
-          label="Справа"
-          value={searchValues.case || ""}
-          onChange={handleInputChange("case")}
-        /> */}
       </fieldset>
     </form>
   );

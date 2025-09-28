@@ -7,13 +7,16 @@ import { useAdmin } from "@/hooks/useAdmin";
 import InspectorTable from "@/components/inspector-table";
 import InspectorPanel from "@/components/inspector-panel";
 import { diff } from "@/lib/algorithm";
+import { Archive, Author } from "@/generated/prisma/inspector-client";
 
 interface InspectorViewProps {
+  archives: Archive[];
+  authors: Author[];
   prefix: string;
   columns: ColDef[];
 }
 
-const InspectorView: React.FC<InspectorViewProps> = ({ prefix, columns }) => {
+const InspectorView: React.FC<InspectorViewProps> = ({ prefix, columns, archives, authors }) => {
   const [filters, setFilters] = useState<Record<string, any>>({});
   const {
     data,
@@ -57,6 +60,8 @@ const InspectorView: React.FC<InspectorViewProps> = ({ prefix, columns }) => {
   return (
     <div className="h-full flex flex-col">
       <InspectorPanel
+        archives={archives}
+        authors={authors}
         activeItem={activeItem}
         onClose={handleResetActiveItem}
         onSave={handleSaveActiveItem}
