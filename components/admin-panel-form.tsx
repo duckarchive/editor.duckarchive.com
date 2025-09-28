@@ -101,6 +101,10 @@ const getFieldType = (key: string, value: any): FieldConfig["type"] => {
       return "textarea";
     }
 
+    if (key.toLowerCase() === "tags") {
+      return "select";
+    }
+
     return "text";
   }
 
@@ -132,21 +136,21 @@ const AdminPanelForm: React.FC<AdminPanelFormProps> = ({
   // Generate field configurations based on defaultValues
   const fieldConfigs: FieldConfig[] = Object.entries(defaultValues)
     .filter(
-      ([key]) => !HIDDEN_FIELDS.includes(key) && !READONLY_FIELDS.includes(key),
-    ) // Exclude ID field from editing
+      ([key]) => !HIDDEN_FIELDS.includes(key) && !READONLY_FIELDS.includes(key)
+    )
     .map(([key, value]) => ({
       key,
       type: getFieldType(key, value),
       label: getFieldLabel(key),
-      required: false, // You can add logic here to determine required fields
+      required: false,
     }));
 
   // Group coordinates fields
   const coordinateFields = fieldConfigs.filter(
-    (field) => field.type === "coordinates",
+    (field) => field.type === "coordinates"
   );
   const otherFields = fieldConfigs.filter(
-    (field) => field.type !== "coordinates",
+    (field) => field.type !== "coordinates"
   );
 
   const handleInputChange = (key: string, value: any) => {
@@ -164,7 +168,9 @@ const AdminPanelForm: React.FC<AdminPanelFormProps> = ({
     }
   };
 
-  const handleCoordinatesChange = (coords: Pick<FormValues, "lat" | "lng" | "radius_m">) => {
+  const handleCoordinatesChange = (
+    coords: Pick<FormValues, "lat" | "lng" | "radius_m">
+  ) => {
     setFormValues((prev) => ({
       ...prev,
       lat: coords.lat,
@@ -316,7 +322,7 @@ const AdminPanelForm: React.FC<AdminPanelFormProps> = ({
         {otherFields.map(renderField)}
       </div>
       {/* Coordinate fields grouped together */}
-      {coordinateFields.length >= 3 && (
+      {coordinateFields.length >= 2 && (
         <div className="space-y-2">
           <CoordinatesInput
             value={{

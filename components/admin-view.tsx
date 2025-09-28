@@ -45,6 +45,8 @@ const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
     const res = confirm(`Підтвердіть оновлення ${itemsToUpdate.length} елементів`);
     if (res) {
       await update(itemsToUpdate.map(item => item.id), diff(values, activeItem || {}));
+    } else {
+      await update([values.id], values);
     }
   };
 

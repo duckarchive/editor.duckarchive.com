@@ -54,8 +54,8 @@ const CoordinatesInput: React.FC<CoordinatesInputProps> = ({ value, onChange, ye
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, debouncedCoordinates]);
 
-  const handleGeoChange = (position: [number, number]) => {
-    setCoordinates({ ...coordinates, lat: position[0].toString(), lng: position[1].toString() });
+  const handleGeoChange = (position: [number, number, number?]) => {
+    setCoordinates({ ...coordinates, lat: position[0].toString(), lng: position[1].toString(), radius_m: position[2] });
   };
 
   const handleLatChange = (lat: string) => {
@@ -93,7 +93,7 @@ const CoordinatesInput: React.FC<CoordinatesInputProps> = ({ value, onChange, ye
     }
   };
 
-  const latLng: [number, number] = [+(coordinates.lat || UKRAINE_CENTER[0]), +(coordinates.lng || UKRAINE_CENTER[1])];
+  const latLng: [number, number, number?] = [+(coordinates.lat || UKRAINE_CENTER[0]), +(coordinates.lng || UKRAINE_CENTER[1]), coordinates.radius_m || 0];
   const title =
     coordinates.lat && coordinates.lng
       ? `${coordinates.lat},${coordinates.lng}${coordinates.radius_m ? ` ±${coordinates.radius_m}м` : ""}`
@@ -105,11 +105,10 @@ const CoordinatesInput: React.FC<CoordinatesInputProps> = ({ value, onChange, ye
           <GeoDuckMap
             key="static-geoduck-map"
             className="rounded-lg text-danger"
-            position={latLng}
+            positions={[latLng]}
             center={latLng}
             year={+(year || 0) || undefined}
-            radius={value.radius_m || 0}
-            hideLayers={{ searchInput: true }}
+            hideLayers={{ searchInput: true, historicalLayers: true }}
             zoom={12}
           />
         )}
@@ -178,15 +177,13 @@ const CoordinatesInput: React.FC<CoordinatesInputProps> = ({ value, onChange, ye
       </Accordion>
 
       <Modal isOpen={isOpen} size="5xl" onClose={onClose} title="Виберіть місце на карті">
-        <ModalContent className="h-[80vh] md:h-[90vh]">
+        <ModalContent className="h-[80vh] md:h-[90vh] pt-8">
           <GeoDuckMap
             key="geoduck-map"
             className="rounded-lg text-danger"
-            position={latLng}
+            positions={[latLng]}
             onPositionChange={handleGeoChange}
             year={+(year || 0) || undefined}
-            radius={coordinates.radius_m || 0}
-            onRadiusChange={handleRadiusChange}
             center={latLng}
             zoom={12}
           />
