@@ -66,7 +66,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
         backdrop="blur"
         isOpen={isOpen && Boolean(activeItem)}
         scrollBehavior="inside"
-        size="4xl"
+        size="full"
         onClose={handleCloseModal}
       >
         <ModalContent>

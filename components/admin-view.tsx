@@ -7,8 +7,11 @@ import { useAdmin } from "@/hooks/useAdmin";
 import AdminTable from "@/components/admin-table";
 import AdminPanel from "@/components/admin-panel";
 import { diff } from "@/lib/algorithm";
+import { Archive, Author } from "@/generated/prisma/inspector-client";
 
 interface AdminViewProps {
+  authors: Author[];
+  archives: Archive[];
   prefix: string;
   columns: ColDef[];
 }
