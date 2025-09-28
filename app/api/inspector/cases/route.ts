@@ -12,6 +12,13 @@ export async function GET(request: NextRequest) {
       where,
       take: 100,
       orderBy: { created_at: "desc" },
+      include: {
+        locations: true,
+        years: true,
+        authors: {
+          include: { author: true }
+        }
+      }
     });
 
     return NextResponse.json(items);
