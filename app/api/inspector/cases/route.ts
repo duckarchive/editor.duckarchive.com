@@ -17,6 +17,9 @@ export async function GET(request: NextRequest) {
         years: true,
         authors: {
           include: { author: true }
+        },
+        description: {
+          include: { fund: true }
         }
       }
     });
