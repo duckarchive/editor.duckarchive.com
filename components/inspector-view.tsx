@@ -4,19 +4,16 @@ import { ColDef } from "ag-grid-community";
 import { useState, useCallback } from "react";
 
 import { useAdmin } from "@/hooks/useAdmin";
-import AdminTable from "@/components/admin-table";
-import AdminPanel from "@/components/admin-panel";
+import InspectorTable from "@/components/inspector-table";
+import InspectorPanel from "@/components/inspector-panel";
 import { diff } from "@/lib/algorithm";
-import { Archive, Author } from "@/generated/prisma/inspector-client";
 
-interface AdminViewProps {
-  authors: Author[];
-  archives: Archive[];
+interface InspectorViewProps {
   prefix: string;
   columns: ColDef[];
 }
 
-const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
+const InspectorView: React.FC<InspectorViewProps> = ({ prefix, columns }) => {
   const [filters, setFilters] = useState<Record<string, any>>({});
   const {
     data,
@@ -59,12 +56,12 @@ const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
 
   return (
     <div className="h-full flex flex-col">
-      <AdminPanel
+      <InspectorPanel
         activeItem={activeItem}
         onClose={handleResetActiveItem}
         onSave={handleSaveActiveItem}
       />
-      <AdminTable
+      <InspectorTable
         columns={columns}
         isLoading={isLoading}
         rows={data || []}
@@ -75,4 +72,4 @@ const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
   );
 };
 
-export default AdminView;
+export default InspectorView;

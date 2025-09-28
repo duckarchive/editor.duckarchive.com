@@ -4,7 +4,7 @@ import { DuckTable } from "@duckarchive/framework";
 import { memo } from "react";
 import { ColDef, FilterChangedEvent, RowClickedEvent } from "ag-grid-community";
 
-interface AdminTableProps {
+interface InspectorTableProps {
   isLoading?: boolean;
   columns: ColDef[];
   rows: any[];
@@ -13,7 +13,7 @@ interface AdminTableProps {
   onFilterChanged: (filters: Record<string, any>) => void;
 }
 
-const AdminTable: React.FC<AdminTableProps> = memo(
+const InspectorTable: React.FC<InspectorTableProps> = memo(
   ({ rows, columns, onFilterChanged, onRowClick, isLoading }) => {
     // const handleSelectionChange = ({
     //   selectedNodes,
@@ -59,6 +59,6 @@ const AdminTable: React.FC<AdminTableProps> = memo(
   },
 );
 
-AdminTable.displayName = "AdminTable";
+InspectorTable.displayName = "InspectorTable";
 
-export default AdminTable;
+export default InspectorTable;

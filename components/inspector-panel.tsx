@@ -9,16 +9,16 @@ import {
 } from "@heroui/modal";
 import { useEffect, useState } from "react";
 
-import AdminPanelForm from "./admin-panel-form";
+import InspectorPanelForm from "./inspector-panel-form";
 
-interface AdminPanelProps {
+interface InspectorPanelProps {
   // items: Array<BaseInstance>;
   activeItem?: BaseInstance;
   onClose?: () => void;
   onSave?: (values: BaseInstance) => void;
 }
 
-const AdminPanel: React.FC<AdminPanelProps> = ({
+const InspectorPanel: React.FC<InspectorPanelProps> = ({
   activeItem,
   onClose: onCloseProp,
   onSave,
@@ -76,7 +76,7 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
 
           <ModalBody>
             {activeItem && (
-              <AdminPanelForm
+              <InspectorPanelForm
                 defaultValues={activeItem}
                 isLoading={isLoading}
                 onCancel={handleCloseModal}
@@ -90,4 +90,4 @@ const AdminPanel: React.FC<AdminPanelProps> = ({
   );
 };
 
-export default AdminPanel;
+export default InspectorPanel;
