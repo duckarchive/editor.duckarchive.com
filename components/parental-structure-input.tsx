@@ -87,7 +87,7 @@ const ParentalStructureInput: React.FC<ParentalStructureInputProps> = ({
 
   const handleArchiveChange = (key: Key | null) => {
     const value = key ? key.toString() : "";
-    const archive = archives.find((a) => a.id === value);
+    const archive = archives.find((a) => a.code === value);
     const archiveCode = archive?.code || "";
 
     setFormValues((prev) => ({ ...prev, archive_code: archiveCode }));
