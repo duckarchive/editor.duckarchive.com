@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { inspectorPrisma } from "@/lib/db";
-import { buildWhereClause } from "@/lib/api-helpers";
+import { buildWhereClause } from "@/lib/api";
 
 export async function GET(request: NextRequest) {
   try {

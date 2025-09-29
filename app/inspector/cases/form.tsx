@@ -95,19 +95,23 @@ const InspectorCaseForm: React.FC<InspectorCaseFormProps> = ({
 
   return (
     <form onSubmit={onSubmit}>
-      <fieldset title="Реквізити">
-        <ParentalStructureInput
-          archives={archives}
-          deps={4}
-          values={{
-            archive_code: formValues?.description.fund.archive.code,
-            fund_code: formValues?.description.fund.code,
-            description_code: formValues?.description.code,
-            case_code: formValues?.code,
-          }}
-          onChange={handleStructureChange}
-        />
-      </fieldset>
+      <ParentalStructureInput
+        archives={archives}
+        deps={4}
+        original_ids={{
+          archive_id: formValues?.description.fund.archive.id,
+          fund_id: formValues?.description.fund.id,
+          description_id: formValues?.description.id,
+          case_id: formValues?.id,
+        }}
+        values={{
+          archive_code: formValues?.description.fund.archive.code,
+          fund_code: formValues?.description.fund.code,
+          description_code: formValues?.description.code,
+          case_code: formValues?.code,
+        }}
+        onChange={handleStructureChange}
+      />
     </form>
   );
 };

@@ -1,7 +1,33 @@
 import qs from "qs";
 
+export const fetcher = async (...args: [RequestInfo, RequestInit?]) =>
+  fetch(...args).then((res) => res.json());
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const postFetcher = async (url: string, { arg }: { arg: any }) => {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(arg),
+  });
+
+  if (!res.ok) {
+    const errorBody = await res.json();
+    const error = new Error(
+      errorBody?.message || `POST ${url} failed with status ${res.status}`
+    );
+
+    throw error;
+  }
+
+  return res.json();
+};
+
 export const buildWhereClause = (searchParams: URLSearchParams | string) => {
-  const where: any = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const where: any= {};
 
   // Parse the query string into a nested object
   const parsed = qs.parse(searchParams.toString());
@@ -9,6 +35,7 @@ export const buildWhereClause = (searchParams: URLSearchParams | string) => {
   if (parsed.filter && typeof parsed.filter === "object") {
     Object.entries(parsed.filter).forEach(([fieldName, filterConfig]) => {
       if (typeof filterConfig === "object" && filterConfig !== null) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { type, filter, ...rest } = filterConfig as any;
         const filterType = type || "contains";
         const filterValue = filter || Object.values(rest)[0];
@@ -82,6 +109,7 @@ export const buildWhereClause = (searchParams: URLSearchParams | string) => {
 };
 
 // Helper to build query strings for client-side
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const buildQueryString = (filters: Record<string, any>): string => {
   if (!filters || Object.keys(filters).length === 0) return "";
 
@@ -90,7 +118,7 @@ export const buildQueryString = (filters: Record<string, any>): string => {
     {
       encode: false,
       arrayFormat: "brackets",
-    },
+    }
   );
 
   return query ? `?${query}` : "";

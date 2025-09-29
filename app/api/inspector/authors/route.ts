@@ -1,4 +1,4 @@
-import { buildWhereClause } from "@/lib/api-helpers";
+import { buildWhereClause } from "@/lib/api";
 import { inspectorPrisma } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
