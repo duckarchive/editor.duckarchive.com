@@ -6,9 +6,10 @@ import { useState } from "react";
 import { fetcher } from "@/lib/api";
 import { buildQueryString } from "@/lib/api";
 import { useGet } from "@/hooks/useApi";
+import { FilterModel } from "ag-grid-community";
 
 interface UseAdminOptions extends SWRConfiguration {
-  filters?: Record<string, any>;
+  filters?: FilterModel;
 }
 
 type ID = string | number;

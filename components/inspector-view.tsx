@@ -1,6 +1,6 @@
 "use client";
 
-import { ColDef } from "ag-grid-community";
+import { ColDef, FilterModel } from "ag-grid-community";
 import { useState, useCallback } from "react";
 
 import { useAdmin } from "@/hooks/useAdmin";
@@ -17,7 +17,7 @@ interface InspectorViewProps {
 }
 
 const InspectorView: React.FC<InspectorViewProps> = ({ prefix, columns, archives, authors }) => {
-  const [filters, setFilters] = useState<Record<string, any>>({});
+  const [filters, setFilters] = useState<FilterModel>({});
   const {
     data,
     error,
@@ -35,7 +35,7 @@ const InspectorView: React.FC<InspectorViewProps> = ({ prefix, columns, archives
   // const [selectedItems, setSelectedItems] = useState<BaseInstance[]>([]);
   const [activeItem, setActiveItem] = useState<BaseInstance>();
 
-  const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
+  const handleFilterChange = useCallback((newFilters: FilterModel) => {
     setFilters(newFilters);
   }, []);
 

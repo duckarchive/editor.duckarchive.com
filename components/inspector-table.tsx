@@ -2,7 +2,7 @@
 
 import { DuckTable } from "@duckarchive/framework";
 import { memo } from "react";
-import { ColDef, FilterChangedEvent, RowClickedEvent } from "ag-grid-community";
+import { ColDef, FilterChangedEvent, FilterModel, FilterModifiedEvent, RowClickedEvent } from "ag-grid-community";
 
 interface InspectorTableProps {
   isLoading?: boolean;
@@ -10,7 +10,7 @@ interface InspectorTableProps {
   rows: any[];
   onRowClick: (rowData?: BaseInstance) => void;
   // onSelectionChanged: (items: BaseInstance[]) => void;
-  onFilterChanged: (filters: Record<string, any>) => void;
+  onFilterChanged: (filters: FilterModel) => void;
 }
 
 const InspectorTable: React.FC<InspectorTableProps> = memo(
