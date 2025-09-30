@@ -19,7 +19,7 @@ import {
   StructureApplyRequest,
   StructureApplyResponse,
 } from "@/app/api/inspector/structure/route";
-import { usePost } from "@/hooks/useApi";
+import { usePost, usePut } from "@/hooks/useApi";
 import { IoHammer, IoPencil } from "react-icons/io5";
 import { Link } from "@heroui/link";
 
@@ -69,10 +69,19 @@ const ParentalStructureInput: React.FC<ParentalStructureInputProps> = ({
     StructureCheckRequest
   >("/api/inspector/structure/check");
 
-  const { trigger: triggerApply, isMutating: isSubmitting } = usePost<
+  const { trigger: triggerCreate, isMutating: isCreating } = usePost<
     StructureApplyResponse,
     StructureApplyRequest
   >("/api/inspector/structure");
+
+  const { trigger: triggerUpdate, isMutating: isUpdating } = usePut<
+    StructureApplyResponse,
+    StructureApplyRequest
+  >("/api/inspector/structure");
+
+  // Determine if this is create mode (no original_ids provided)
+  const isCreateMode = !original_ids || Object.values(original_ids).every(id => !id);
+  const isSubmitting = isCreateMode ? isCreating : isUpdating;
 
   const generateDisplayString = () => {
     const parts = [];
@@ -130,10 +139,11 @@ const ParentalStructureInput: React.FC<ParentalStructureInputProps> = ({
     }
 
     try {
+      const triggerApply = isCreateMode ? triggerCreate : triggerUpdate;
       const result = await triggerApply(formValues);
 
       if (result.success) {
-        console.log("Structure applied successfully:", result.applied);
+        console.log(`Structure ${isCreateMode ? 'created' : 'updated'} successfully:`, result.applied);
 
         // Call onChange for each field if provided
         if (onChange) {
@@ -144,17 +154,17 @@ const ParentalStructureInput: React.FC<ParentalStructureInputProps> = ({
                 onChange("archive_id", archive.id);
               }
             } else {
-              onChange(field, value);
+              onChange(field, value as string);
             }
           });
         }
 
         onOpenChange();
       } else {
-        console.error("Structure apply failed:", result.error);
+        console.error(`Structure ${isCreateMode ? 'create' : 'update'} failed:`, result.error);
       }
     } catch (error) {
-      console.error("Submit error:", error);
+      console.error(`${isCreateMode ? 'Create' : 'Update'} error:`, error);
     }
   };
 
@@ -306,7 +316,10 @@ const ParentalStructureInput: React.FC<ParentalStructureInputProps> = ({
               )}
               {isChecked && checkResult?.valid && (
                 <Button color="success" type="submit" isLoading={isSubmitting}>
-                  {isSubmitting ? "Застосування..." : "Застосувати"}
+                  {isSubmitting 
+                    ? (isCreateMode ? "Створення..." : "Оновлення...") 
+                    : (isCreateMode ? "Створити" : "Оновити")
+                  }
                 </Button>
               )}
             </ModalFooter>

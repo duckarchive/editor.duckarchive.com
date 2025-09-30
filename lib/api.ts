@@ -26,6 +26,28 @@ export const postFetcher = async (url: string, { arg }: { arg: any }) => {
   return res.json();
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const putFetcher = async (url: string, { arg }: { arg: any }) => {
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(arg),
+  });
+
+  if (!res.ok) {
+    const errorBody = await res.json();
+    const error = new Error(
+      errorBody?.message || `PUT ${url} failed with status ${res.status}`
+    );
+
+    throw error;
+  }
+
+  return res.json();
+};
+
 const fieldTypeToWhere = (fieldName: string, filterConfig: FilterModel) => {
   const { type, filter, ...rest } = filterConfig;
   const filterType = type || "contains";
