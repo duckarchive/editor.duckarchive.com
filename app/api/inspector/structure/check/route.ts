@@ -25,6 +25,13 @@ interface DiffItem {
   action: "create";
   code: string;
   message: string;
+  relations?: {
+    years?: number;
+    authors?: number;
+    locations?: number;
+    matches?: number;
+    fetches?: number;
+  };
 }
 
 export interface StructureCheckResponse {
@@ -32,6 +39,54 @@ export interface StructureCheckResponse {
   diff_items: DiffItem[];
   errors?: string[];
   deps?: number;
+}
+
+async function getRelationCounts(
+  entity: "fund" | "description" | "case",
+  id: string
+) {
+  const relations: {
+    years?: number;
+    authors?: number;
+    locations?: number;
+    matches?: number;
+    fetches?: number;
+  } = {};
+
+  if (entity === "fund") {
+    const [years, matches, fetches] = await Promise.all([
+      inspectorPrisma.fundYear.count({ where: { fund_id: id } }),
+      inspectorPrisma.match.count({ where: { fund_id: id } }),
+      inspectorPrisma.fetch.count({ where: { fund_id: id } }),
+    ]);
+    relations.years = years;
+    relations.matches = matches;
+    relations.fetches = fetches;
+  } else if (entity === "description") {
+    const [years, matches, fetches] = await Promise.all([
+      inspectorPrisma.descriptionYear.count({ where: { description_id: id } }),
+      inspectorPrisma.match.count({ where: { description_id: id } }),
+      inspectorPrisma.fetch.count({ where: { description_id: id } }),
+    ]);
+    relations.years = years;
+    relations.matches = matches;
+    relations.fetches = fetches;
+  } else if (entity === "case") {
+    const [years, authors, locations, matches, fetches] = await Promise.all([
+      inspectorPrisma.caseYear.count({ where: { case_id: id } }),
+      inspectorPrisma.caseAuthor.count({ where: { case_id: id } }),
+      inspectorPrisma.caseLocation.count({ where: { case_id: id } }),
+      inspectorPrisma.match.count({ where: { case_id: id } }),
+      inspectorPrisma.fetch.count({ where: { case_id: id } }),
+    ]);
+    relations.years = years;
+    relations.authors = authors;
+    relations.locations = locations;
+    relations.matches = matches;
+    relations.fetches = fetches;
+  }
+
+  return relations;
 }
 
 export async function POST(
@@ -48,6 +103,33 @@ export async function POST(
     if (body.new.fund_code) deps = 2;
     if (body.new.description_code) deps = 3;
     if (body.new.case_code) deps = 4;
+
+    // Get original entities by IDs (if provided)
+    const originalEntities = await Promise.all([
+      body.original.archive_id
+        ? inspectorPrisma.archive.findUnique({
+            where: { id: body.original.archive_id },
+          })
+        : null,
+      body.original.fund_id
+        ? inspectorPrisma.fund.findUnique({
+            where: { id: body.original.fund_id },
+          })
+        : null,
+      body.original.description_id
+        ? inspectorPrisma.description.findUnique({
+            where: { id: body.original.description_id },
+          })
+        : null,
+      body.original.case_id
+        ? inspectorPrisma.case.findUnique({
+            where: { id: body.original.case_id },
+          })
+        : null,
+    ]);
+
+    const [originalArchive, originalFund, originalDescription, originalCase] =
+      originalEntities;
 
     // Check what entities exist by their codes with strict hierarchy relationships
     const archiveExists = body.new.archive_code
@@ -144,11 +226,25 @@ export async function POST(
 
       if (archiveExists && !fundExists) {
         // Create fund under archive
+        let message = `Фонд "${body.new.fund_code}" буде створено в архіві "${body.new.archive_code}"`;
+        let relations = undefined;
+
+        // Check if we're transferring from another fund
+        if (originalFund) {
+          const sourceRelations = await getRelationCounts(
+            "fund",
+            originalFund.id
+          );
+          message = `Фонд "${body.new.fund_code}" буде створено в архіві "${body.new.archive_code}". Зв'язки будуть перенесені з фонду "${originalFund.code}"`;
+          relations = sourceRelations;
+        }
+
         diff_items.push({
           entity: "фонд",
           action: "create",
           code: body.new.fund_code,
-          message: `Фонд "${body.new.fund_code}" буде створено в архіві "${body.new.archive_code}"`,
+          message,
+          relations,
         });
       }
     }
@@ -178,11 +274,25 @@ export async function POST(
 
       if (archiveExists && fundExists && !descriptionExists) {
         // Create description under fund
+        let message = `Опис "${body.new.description_code}" буде створено в фонді "${body.new.fund_code}" архіву "${body.new.archive_code}"`;
+        let relations = undefined;
+
+        // Check if we're transferring from another description
+        if (originalDescription) {
+          const sourceRelations = await getRelationCounts(
+            "description",
+            originalDescription.id
+          );
+          message = `Опис "${body.new.description_code}" буде створено в фонді "${body.new.fund_code}" архіву "${body.new.archive_code}". Зв'язки будуть перенесені з опису "${originalDescription.code}"`;
+          relations = sourceRelations;
+        }
+
         diff_items.push({
           entity: "опис",
           action: "create",
           code: body.new.description_code,
-          message: `Опис "${body.new.description_code}" буде створено в фонді "${body.new.fund_code}" архіву "${body.new.archive_code}"`,
+          message,
+          relations,
         });
       }
 
@@ -232,11 +342,25 @@ export async function POST(
 
       if (archiveExists && fundExists && descriptionExists && !caseExists) {
         // Create case under description
+        let message = `Справа "${body.new.case_code}" буде створена в описі "${body.new.description_code}" фонду "${body.new.fund_code}" архіву "${body.new.archive_code}"`;
+        let relations = undefined;
+
+        // Check if we're transferring from another case
+        if (originalCase) {
+          const sourceRelations = await getRelationCounts(
+            "case",
+            originalCase.id
+          );
+          message = `Справа "${body.new.case_code}" буде створена в описі "${body.new.description_code}" фонду "${body.new.fund_code}" архіву "${body.new.archive_code}". Зв'язки будуть перенесені зі справи "${originalCase.code}"`;
+          relations = sourceRelations;
+        }
+
         diff_items.push({
           entity: "справа",
           action: "create",
           code: body.new.case_code,
-          message: `Справа "${body.new.case_code}" буде створена в описі "${body.new.description_code}" фонду "${body.new.fund_code}" архіву "${body.new.archive_code}"`,
+          message,
+          relations,
         });
       }
 

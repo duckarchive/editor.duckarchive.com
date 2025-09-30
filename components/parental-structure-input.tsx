@@ -253,6 +253,40 @@ const ParentalStructureInput: React.FC<ParentalStructureInputProps> = ({
                                 <p className="text-sm font-medium text-gray-800">
                                   {item.message}
                                 </p>
+                                {item.relations && (
+                                  <div className="mt-2 pt-2 border-t border-gray-200">
+                                    <p className="text-xs text-gray-600 font-medium mb-1">
+                                      Пов'язані дані:
+                                    </p>
+                                    <div className="flex flex-wrap gap-2">
+                                      {item.relations.years !== undefined && item.relations.years > 0 && (
+                                        <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">
+                                          Роки: {item.relations.years}
+                                        </span>
+                                      )}
+                                      {item.relations.authors !== undefined && item.relations.authors > 0 && (
+                                        <span className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded">
+                                          Автори: {item.relations.authors}
+                                        </span>
+                                      )}
+                                      {item.relations.locations !== undefined && item.relations.locations > 0 && (
+                                        <span className="text-xs px-2 py-1 bg-orange-100 text-orange-700 rounded">
+                                          Локації: {item.relations.locations}
+                                        </span>
+                                      )}
+                                      {item.relations.matches !== undefined && item.relations.matches > 0 && (
+                                        <span className="text-xs px-2 py-1 bg-yellow-100 text-yellow-700 rounded">
+                                          Співпадіння: {item.relations.matches}
+                                        </span>
+                                      )}
+                                      {item.relations.fetches !== undefined && item.relations.fetches > 0 && (
+                                        <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">
+                                          Завантаження: {item.relations.fetches}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
