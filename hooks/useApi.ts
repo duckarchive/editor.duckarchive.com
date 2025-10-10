@@ -1,4 +1,7 @@
-import useSWR, { SWRConfiguration } from "swr";
+"use client";
+
+import useSWR from "swr";
+import type { SWRConfiguration } from "swr";
 import useSWRMutation, { SWRMutationConfiguration } from "swr/mutation";
 
 import { fetcher, postFetcher, putFetcher } from "@/lib/api";
