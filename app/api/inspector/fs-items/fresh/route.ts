@@ -29,7 +29,7 @@ export async function GET() {
         ],
       },
       take: 1000,
-      orderBy: { project_id: "asc" },
+      orderBy: { project_id: "desc" },
       include: {
         project: {
           include: {
