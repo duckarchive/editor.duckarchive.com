@@ -14,9 +14,10 @@ interface InspectorViewProps {
   authors: Author[];
   prefix: string;
   columns: ColDef[];
+  onSelectionChanged?: (items: BaseInstance[]) => void;
 }
 
-const InspectorView: React.FC<InspectorViewProps> = ({ prefix, columns, archives, authors }) => {
+const InspectorView: React.FC<InspectorViewProps> = ({ prefix, columns, archives, authors, onSelectionChanged }) => {
   const [filters, setFilters] = useState<FilterModel>({});
   const {
     data,
@@ -32,12 +33,19 @@ const InspectorView: React.FC<InspectorViewProps> = ({ prefix, columns, archives
     isDeleting,
   } = useAdmin<BaseInstance>(prefix, { filters });
 
-  // const [selectedItems, setSelectedItems] = useState<BaseInstance[]>([]);
+  const [selectedItems, setSelectedItems] = useState<BaseInstance[]>([]);
   const [activeItem, setActiveItem] = useState<BaseInstance>();
 
   const handleFilterChange = useCallback((newFilters: FilterModel) => {
     setFilters(newFilters);
   }, []);
+
+  const handleSelectionChange = useCallback((items: BaseInstance[]) => {
+    if (onSelectionChanged) {
+      onSelectionChanged(items);
+    }
+    setSelectedItems(items);
+  }, [onSelectionChanged]);
 
   const handleResetActiveItem = () => {
     setActiveItem(undefined);
@@ -72,6 +80,7 @@ const InspectorView: React.FC<InspectorViewProps> = ({ prefix, columns, archives
         rows={data || []}
         onFilterChanged={handleFilterChange}
         onRowClick={setActiveItem}
+        onSelectionChanged={handleSelectionChange}
       />
     </div>
   );

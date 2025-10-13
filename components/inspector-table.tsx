@@ -9,21 +9,22 @@ interface InspectorTableProps {
   columns: ColDef[];
   rows: any[];
   onRowClick: (rowData?: BaseInstance) => void;
-  // onSelectionChanged: (items: BaseInstance[]) => void;
+  onSelectionChanged: (items: BaseInstance[]) => void;
   onFilterChanged: (filters: FilterModel) => void;
 }
 
 const InspectorTable: React.FC<InspectorTableProps> = memo(
-  ({ rows, columns, onFilterChanged, onRowClick, isLoading }) => {
-    // const handleSelectionChange = ({
-    //   selectedNodes,
-    // }: SelectionChangedEvent<BaseInstance, any>) => {
-    //   if (selectedNodes) {
-    //     onSelectionChanged(selectedNodes.map((node) => node.data));
-    //   } else {
-    //     onSelectionChanged([]);
-    //   }
-    // };
+  ({ rows, columns, onFilterChanged, onRowClick, onSelectionChanged, isLoading }) => {
+    const handleSelectionChange = ({
+      api,
+    }: any) => {
+      const selectedNodes = api.getSelectedNodes();
+      if (selectedNodes) {
+        onSelectionChanged(selectedNodes.map((node: any) => node.data));
+      } else {
+        onSelectionChanged([]);
+      }
+    };
 
     const handleFilterChange = (event: FilterChangedEvent) => {
       const filterModel = event.api.getFilterModel();
@@ -47,13 +48,13 @@ const InspectorTable: React.FC<InspectorTableProps> = memo(
         appTheme="light"
         columns={sortedColumns}
         isLoading={isLoading}
-        // rowSelection={{ mode: "multiRow", selectAll: "filtered" }}
+        rowSelection={{ mode: "multiRow", selectAll: "filtered" }}
         rows={rows}
         setActiveFilterId={() => {}}
         suppressHorizontalScroll={false}
         onFilterChanged={handleFilterChange}
         onRowClicked={handleClick}
-        // onSelectionChanged={handleSelectionChange}
+        onSelectionChanged={handleSelectionChange}
       />
     );
   },
