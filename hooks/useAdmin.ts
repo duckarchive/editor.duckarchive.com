@@ -1,15 +1,15 @@
 "use client";
 
-import useSWR, { mutate } from "swr";
+import useSWR, { mutate, SWRConfiguration } from "swr";
 import { useState } from "react";
 
-import { fetcher } from "@/lib/fetcher";
-import { buildQueryString } from "@/lib/api-helpers";
+import { fetcher } from "@/lib/api";
+import { buildQueryString } from "@/lib/api";
+import { useGet } from "@/hooks/useApi";
+import { FilterModel } from "ag-grid-community";
 
-interface UseAdminOptions {
-  revalidateOnFocus?: boolean;
-  revalidateOnReconnect?: boolean;
-  filters?: Record<string, any>;
+interface UseAdminOptions extends SWRConfiguration {
+  filters?: FilterModel;
 }
 
 type ID = string | number;
@@ -30,19 +30,16 @@ interface AdminHookReturn<T> {
 
 export const useAdmin = <T extends { id: string | number }>(
   prefix: string,
-  options: UseAdminOptions = {},
+  { filters, ...options }: UseAdminOptions = {},
 ): AdminHookReturn<T> => {
   const [isCreating, setIsCreating] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const queryString = buildQueryString(options.filters || {});
+  const queryString = buildQueryString(filters || {});
   const apiUrl = `/api/${prefix}${queryString}`;
 
-  const { data, error, isLoading } = useSWR<T[]>(apiUrl, fetcher, {
-    revalidateOnFocus: options.revalidateOnFocus ?? false,
-    revalidateOnReconnect: options.revalidateOnReconnect ?? true,
-  });
+  const { data, error, isLoading } = useGet<T[]>(apiUrl, options);
 
   const create = async (item: Omit<T, "id">): Promise<T> => {
     setIsCreating(true);

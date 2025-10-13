@@ -1,20 +1,24 @@
 "use client";
 
-import { ColDef } from "ag-grid-community";
+import { ColDef, FilterModel } from "ag-grid-community";
 import { useState, useCallback } from "react";
 
 import { useAdmin } from "@/hooks/useAdmin";
-import AdminTable from "@/components/admin-table";
-import AdminPanel from "@/components/admin-panel";
+import InspectorTable from "@/components/inspector-table";
+import InspectorPanel from "@/components/inspector-panel";
 import { diff } from "@/lib/algorithm";
+import { Archive, Author } from "@/generated/prisma/inspector-client";
 
-interface AdminViewProps {
+interface InspectorViewProps {
+  archives: Archive[];
+  authors: Author[];
   prefix: string;
   columns: ColDef[];
+  onSelectionChanged?: (items: BaseInstance[]) => void;
 }
 
-const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
-  const [filters, setFilters] = useState<Record<string, any>>({});
+const InspectorView: React.FC<InspectorViewProps> = ({ prefix, columns, archives, authors, onSelectionChanged }) => {
+  const [filters, setFilters] = useState<FilterModel>({});
   const {
     data,
     error,
@@ -29,12 +33,19 @@ const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
     isDeleting,
   } = useAdmin<BaseInstance>(prefix, { filters });
 
-  // const [selectedItems, setSelectedItems] = useState<BaseInstance[]>([]);
+  const [selectedItems, setSelectedItems] = useState<BaseInstance[]>([]);
   const [activeItem, setActiveItem] = useState<BaseInstance>();
 
-  const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
+  const handleFilterChange = useCallback((newFilters: FilterModel) => {
     setFilters(newFilters);
   }, []);
+
+  const handleSelectionChange = useCallback((items: BaseInstance[]) => {
+    if (onSelectionChanged) {
+      onSelectionChanged(items);
+    }
+    setSelectedItems(items);
+  }, [onSelectionChanged]);
 
   const handleResetActiveItem = () => {
     setActiveItem(undefined);
@@ -56,20 +67,23 @@ const AdminView: React.FC<AdminViewProps> = ({ prefix, columns }) => {
 
   return (
     <div className="h-full flex flex-col">
-      <AdminPanel
+      <InspectorPanel
+        archives={archives}
+        authors={authors}
         activeItem={activeItem}
         onClose={handleResetActiveItem}
         onSave={handleSaveActiveItem}
       />
-      <AdminTable
+      <InspectorTable
         columns={columns}
         isLoading={isLoading}
         rows={data || []}
         onFilterChanged={handleFilterChange}
         onRowClick={setActiveItem}
+        onSelectionChanged={handleSelectionChange}
       />
     </div>
   );
 };
 
-export default AdminView;
+export default InspectorView;

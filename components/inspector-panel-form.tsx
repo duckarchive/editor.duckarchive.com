@@ -17,7 +17,7 @@ interface FormValues extends BaseInstance {
   radius_m?: number;
 }
 
-interface AdminPanelFormProps {
+interface InspectorPanelFormProps {
   defaultValues: FormValues;
   onSubmit: (values: FormValues) => void;
   onCancel: () => void;
@@ -120,7 +120,7 @@ const getFieldLabel = (key: string): string => {
     .trim();
 };
 
-const AdminPanelForm: React.FC<AdminPanelFormProps> = ({
+const InspectorPanelForm: React.FC<InspectorPanelFormProps> = ({
   defaultValues,
   onSubmit,
   onCancel,
@@ -350,4 +350,4 @@ const AdminPanelForm: React.FC<AdminPanelFormProps> = ({
   );
 };
 
-export default AdminPanelForm;
+export default InspectorPanelForm;

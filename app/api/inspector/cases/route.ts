@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { inspectorPrisma } from "@/lib/db";
-import { buildWhereClause } from "@/lib/api-helpers";
+import { buildWhereClause } from "@/lib/api";
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,6 +17,9 @@ export async function GET(request: NextRequest) {
         years: true,
         authors: {
           include: { author: true }
+        },
+        description: {
+          include: { fund: { include: { archive: true } } }
         }
       }
     });

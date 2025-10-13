@@ -2,28 +2,29 @@
 
 import { DuckTable } from "@duckarchive/framework";
 import { memo } from "react";
-import { ColDef, FilterChangedEvent, RowClickedEvent } from "ag-grid-community";
+import { ColDef, FilterChangedEvent, FilterModel, FilterModifiedEvent, RowClickedEvent } from "ag-grid-community";
 
-interface AdminTableProps {
+interface InspectorTableProps {
   isLoading?: boolean;
   columns: ColDef[];
   rows: any[];
   onRowClick: (rowData?: BaseInstance) => void;
-  // onSelectionChanged: (items: BaseInstance[]) => void;
-  onFilterChanged: (filters: Record<string, any>) => void;
+  onSelectionChanged: (items: BaseInstance[]) => void;
+  onFilterChanged: (filters: FilterModel) => void;
 }
 
-const AdminTable: React.FC<AdminTableProps> = memo(
-  ({ rows, columns, onFilterChanged, onRowClick, isLoading }) => {
-    // const handleSelectionChange = ({
-    //   selectedNodes,
-    // }: SelectionChangedEvent<BaseInstance, any>) => {
-    //   if (selectedNodes) {
-    //     onSelectionChanged(selectedNodes.map((node) => node.data));
-    //   } else {
-    //     onSelectionChanged([]);
-    //   }
-    // };
+const InspectorTable: React.FC<InspectorTableProps> = memo(
+  ({ rows, columns, onFilterChanged, onRowClick, onSelectionChanged, isLoading }) => {
+    const handleSelectionChange = ({
+      api,
+    }: any) => {
+      const selectedNodes = api.getSelectedNodes();
+      if (selectedNodes) {
+        onSelectionChanged(selectedNodes.map((node: any) => node.data));
+      } else {
+        onSelectionChanged([]);
+      }
+    };
 
     const handleFilterChange = (event: FilterChangedEvent) => {
       const filterModel = event.api.getFilterModel();
@@ -47,18 +48,18 @@ const AdminTable: React.FC<AdminTableProps> = memo(
         appTheme="light"
         columns={sortedColumns}
         isLoading={isLoading}
-        // rowSelection={{ mode: "multiRow", selectAll: "filtered" }}
+        rowSelection={{ mode: "multiRow", selectAll: "filtered" }}
         rows={rows}
         setActiveFilterId={() => {}}
         suppressHorizontalScroll={false}
         onFilterChanged={handleFilterChange}
         onRowClicked={handleClick}
-        // onSelectionChanged={handleSelectionChange}
+        onSelectionChanged={handleSelectionChange}
       />
     );
   },
 );
 
-AdminTable.displayName = "AdminTable";
+InspectorTable.displayName = "InspectorTable";
 
-export default AdminTable;
+export default InspectorTable;
