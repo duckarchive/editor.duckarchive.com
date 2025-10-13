@@ -11,7 +11,7 @@ import {
   useDisclosure,
 } from "@heroui/modal";
 import InspectorView from "@/components/inspector-view";
-import { Author } from "@/generated/prisma/inspector-client";
+import { Archive, Author } from "@/generated/prisma/inspector-client";
 import AuthorMergeForm from "@/app/inspector/authors/author-merge-form";
 import { ColDef } from "ag-grid-community";
 import { BaseInstance } from "@/types";
@@ -19,16 +19,17 @@ import { useGet, usePost } from "@/hooks/useApi";
 
 interface AuthorsViewProps {
   columns: ColDef[];
-  archives: any[];
+  archives: Archive[];
+  authors: Author[];
 }
 
 const AuthorsView: React.FC<AuthorsViewProps> = ({
   columns,
   archives,
+  authors,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedAuthors, setSelectedAuthors] = useState<Author[]>([]);
-  const { data: authors, mutate } = useGet<Author[]>("/api/inspector/authors");
   const { trigger: mergeAuthors, isMutating: isMerging } = usePost<
     Author,
     { target: Author; toDelete: string[] }
@@ -48,7 +49,6 @@ const AuthorsView: React.FC<AuthorsViewProps> = ({
       .filter((id) => id !== data.id);
 
     await mergeAuthors({ target: data, toDelete });
-    mutate(); // Re-fetch authors
     setSelectedAuthors([]);
     onClose();
   };
@@ -69,7 +69,7 @@ const AuthorsView: React.FC<AuthorsViewProps> = ({
         prefix="inspector/authors"
         columns={columns}
         archives={archives}
-        authors={authors || []}
+        authors={authors}
         onSelectionChanged={handleSelectionChange}
       />
       <Modal isOpen={isOpen} onClose={onClose} size="3xl">
