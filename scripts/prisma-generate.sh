@@ -5,7 +5,6 @@ names=(
   "duckkey"
   "inspector"
   "duckarchive"
-  "catalog"
 )
 
 # run prisma generate for each schema
