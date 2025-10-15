@@ -68,3 +68,51 @@ export const parseMapLinkUrl = (url: string) => {
     return null;
   }
 };
+
+export const parseDate = (dateString: string): { start_year: number | null; end_year: number | null } => {
+  if (!dateString) {
+    return { start_year: null, end_year: null };
+  }
+
+  // Remove any non-numeric characters except for hyphens and spaces
+  const cleanedString = dateString.replace(/[^\d\s-]/g, '').trim();
+
+  // Case 1: Range of years (e.g., "1941-1945", "1941 - 1945")
+  const rangeMatch = cleanedString.match(/^(\d{4})\s*-\s*(\d{4})$/);
+  if (rangeMatch) {
+    return {
+      start_year: parseInt(rangeMatch[1], 10),
+      end_year: parseInt(rangeMatch[2], 10),
+    };
+  }
+
+  // Case 2: Single year (e.g., "1941")
+  const singleYearMatch = cleanedString.match(/^(\d{4})$/);
+  if (singleYearMatch) {
+    const year = parseInt(singleYearMatch[1], 10);
+    return { start_year: year, end_year: year };
+  }
+
+  // Case 3: List of years (e.g., "1941, 1943, 1945") - take min and max
+  const yearList = cleanedString.split(/[\s,]+/).map(s => parseInt(s, 10)).filter(y => !isNaN(y) && y > 1000 && y < 3000);
+  if (yearList.length > 1) {
+    return {
+      start_year: Math.min(...yearList),
+      end_year: Math.max(...yearList),
+    };
+  }
+  
+  // If no specific format is matched, try to find all 4-digit numbers and take min/max
+  const allYears = (dateString.match(/\d{4}/g) || []).map(y => parseInt(y, 10));
+  if (allYears.length > 0) {
+    const validYears = allYears.filter(y => y > 1000 && y < 3000);
+    if (validYears.length > 0) {
+      return {
+        start_year: Math.min(...validYears),
+        end_year: Math.max(...validYears),
+      };
+    }
+  }
+
+  return { start_year: null, end_year: null };
+};

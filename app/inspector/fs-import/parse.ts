@@ -1,6 +1,5 @@
-import { FSItemsFreshResponse } from "@/app/api/inspector/fs-items/fresh/route";
+import { FSItemsFreshResponse } from "@/app/api/inspector/fs-import/route";
 import { parseCode } from "@duckarchive/framework";
-import { get, setWith, uniq } from "lodash";
 
 const latin2cyrillic = (str: string): string => {
   const charMap: Record<string, string> = {
@@ -141,7 +140,7 @@ export const autoParseFSItem = (item?: FSItemsFreshResponse[number]): string[] =
   if (!item) return [];
   const a = item.project.archive?.code || "";
 
-  const [_, f, d, c] = (regexps.find((r) => r.test(item.volume || ""))?.exec(item.volume || "") || []).map(raw => parseCode(raw));
+  const [_, f, d, c] = (regexps.find((r) => r.test(item.volumes || ""))?.exec(item.volumes || "") || []).map(raw => parseCode(raw));
 
   return [[a, f, d, c].join("-")];
 };
