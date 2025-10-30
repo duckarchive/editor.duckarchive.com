@@ -159,7 +159,7 @@ const ImportModule: React.FC = () => {
           <ModalContent>
             <ModalHeader>Результати перевірки</ModalHeader>
             <ModalBody>
-              <div className="space-y-4">
+              <div className="space-y-4 overflow-y-auto max-h-96">
                 <div>
                   <h3 className="font-semibold">Фонди</h3>
                   <p>Створити: {checkStats.funds.create.join(", ")}</p>
