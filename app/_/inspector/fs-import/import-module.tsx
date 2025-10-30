@@ -1,7 +1,7 @@
 "use client";
 
 import { FSItemsFreshResponse } from "@/app/api/inspector/fs-import/route";
-import { autoParseFSItem } from "@/app/inspector/fs-import/parse";
+import { autoParseFSItem } from "@/app/_/inspector/fs-import/parse";
 import { useGet, usePost } from "@/hooks/useApi";
 import { DuckTable } from "@duckarchive/framework";
 import { Button } from "@heroui/button";

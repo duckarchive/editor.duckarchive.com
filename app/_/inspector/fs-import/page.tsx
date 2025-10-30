@@ -1,4 +1,4 @@
-import ImportModule from "@/app/inspector/fs-import/import-module";
+import ImportModule from "@/app/_/inspector/fs-import/import-module";
 import InspectorView from "@/components/inspector-view";
 import { Prisma } from "@/generated/prisma/inspector-client";
 import { inspectorPrisma } from "@/lib/db";
