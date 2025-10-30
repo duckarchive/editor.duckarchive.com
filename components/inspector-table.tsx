@@ -2,19 +2,20 @@
 
 import { DuckTable } from "@duckarchive/framework";
 import { memo } from "react";
-import { ColDef, FilterChangedEvent, FilterModel, FilterModifiedEvent, RowClickedEvent } from "ag-grid-community";
+import { CellValueChangedEvent, ColDef, FilterChangedEvent, FilterModel, FilterModifiedEvent, RowClickedEvent } from "ag-grid-community";
 
 interface InspectorTableProps {
   isLoading?: boolean;
   columns: ColDef[];
   rows: any[];
-  onRowClick: (rowData?: BaseInstance) => void;
+  onCellValueChanged?: (newData: BaseInstance) => void;
+  onRowClick?: (rowData?: BaseInstance) => void;
   onSelectionChanged: (items: BaseInstance[]) => void;
   onFilterChanged: (filters: FilterModel) => void;
 }
 
 const InspectorTable: React.FC<InspectorTableProps> = memo(
-  ({ rows, columns, onFilterChanged, onRowClick, onSelectionChanged, isLoading }) => {
+  ({ rows, columns, onFilterChanged, onRowClick, onSelectionChanged, onCellValueChanged, isLoading }) => {
     const handleSelectionChange = ({
       api,
     }: any) => {
@@ -33,7 +34,11 @@ const InspectorTable: React.FC<InspectorTableProps> = memo(
     };
 
     const handleClick = (event: RowClickedEvent<BaseInstance, any>) => {
-      onRowClick(event.data);
+      onRowClick?.(event.data);
+    };
+
+    const handleCellValueChange = (event: CellValueChangedEvent<BaseInstance>) => {
+      onCellValueChanged?.(event.data);
     };
 
     // move created_at, updated_at to the end
@@ -51,7 +56,12 @@ const InspectorTable: React.FC<InspectorTableProps> = memo(
         rowSelection={{ mode: "multiRow", selectAll: "filtered" }}
         rows={rows}
         setActiveFilterId={() => {}}
+        selectionColumnDef={{
+          cellClass: "bg-warning-900",
+          headerClass: "bg-warning-800",
+        }}
         suppressHorizontalScroll={false}
+        onCellValueChanged={handleCellValueChange}
         onFilterChanged={handleFilterChange}
         onRowClicked={handleClick}
         onSelectionChanged={handleSelectionChange}

@@ -1,7 +1,7 @@
 "use client";
 
 import { FilterModel } from "ag-grid-community";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 import { useAdmin } from "@/hooks/useAdmin";
 import InspectorTable from "@/components/inspector-table";
@@ -9,18 +9,30 @@ import { diff } from "@/lib/algorithm";
 import { autoParseFSItem } from "@/app/inspector/import-family-search/parse";
 import { Link } from "@heroui/link";
 import { GetImportFamilySearchResponse } from "@/app/api/inspector/import-family-search/route";
+import { Button } from "@heroui/button";
+import { usePost } from "@/hooks/useApi";
 
 type TableItem = GetImportFamilySearchResponse[number];
 
-const renderParseResultCell = ({ data }: { data: TableItem }) => {
-  const parsed = autoParseFSItem(data);
-  return (
-    <>
-      {parsed.map((item) => (
-        <p key={`${data.dgs}-${item}`}>{item}</p>
-      ))}
-    </>
-  );
+const renderParseResultCell = ({
+  value,
+  data,
+}: {
+  value: string;
+  data: TableItem;
+}) => {
+  if (value) {
+    return value;
+  } else {
+    const parsed = autoParseFSItem(data);
+    return (
+      <>
+        {parsed.map((item) => (
+          <p key={`${data.dgs}-${item}`}>{item}</p>
+        ))}
+      </>
+    );
+  }
 };
 
 interface InspectorViewProps {
@@ -28,7 +40,10 @@ interface InspectorViewProps {
   onSelectionChanged?: (items: BaseInstance[]) => void;
 }
 
-const ImportFamilySearch: React.FC<InspectorViewProps> = ({ prefix, onSelectionChanged }) => {
+const ImportFamilySearch: React.FC<InspectorViewProps> = ({
+  prefix,
+  onSelectionChanged,
+}) => {
   const [filters, setFilters] = useState<FilterModel>({});
   const {
     data,
@@ -42,34 +57,39 @@ const ImportFamilySearch: React.FC<InspectorViewProps> = ({ prefix, onSelectionC
     isCreating,
     isUpdating,
     isDeleting,
-  } = useAdmin<BaseInstance>(prefix, { filters });
+  } = useAdmin<TableItem>(prefix, { filters });
 
-  const [selectedItems, setSelectedItems] = useState<BaseInstance[]>([]);
-  const [activeItem, setActiveItem] = useState<BaseInstance>();
+  const { trigger: importItems, isMutating: isImporting } = usePost<any, any>(
+    "/api/inspector/import-family-search"
+  );
+
+  const [selectedItems, setSelectedItems] = useState<TableItem[]>([]);
 
   const handleFilterChange = useCallback((newFilters: FilterModel) => {
     setFilters(newFilters);
   }, []);
 
-  const handleSelectionChange = useCallback((items: BaseInstance[]) => {
-    if (onSelectionChanged) {
-      onSelectionChanged(items);
-    }
-    setSelectedItems(items);
-  }, [onSelectionChanged]);
-
-  const handleResetActiveItem = () => {
-    setActiveItem(undefined);
+  const handleEdit = (newData: BaseInstance) => {
+    console.log("Edited item:", newData);
   };
 
-  const handleSaveActiveItem = async (values: BaseInstance) => {
-    const itemsToUpdate = await similar(values.id, diff(values, activeItem || {}));
-    const res = confirm(`Підтвердіть оновлення ${itemsToUpdate.length} елементів`);
-    if (res) {
-      await update(itemsToUpdate.map(item => item.id), diff(values, activeItem || {}));
-    } else {
-      await update([values.id], values);
-    }
+  const handleSelectionChange = useCallback(
+    (items: BaseInstance[]) => {
+      if (onSelectionChanged) {
+        onSelectionChanged(items);
+      }
+      setSelectedItems(items as TableItem[]);
+    },
+    [onSelectionChanged]
+  );
+
+  const handleImport = async () => {
+    const items = selectedItems.map((el: any) => ({
+      ...el,
+      parsed_full_code: el.parsed_full_code || autoParseFSItem(el).join("-"),
+    }));
+    await importItems(items);
+    await refresh();
   };
 
   if (error) {
@@ -78,8 +98,51 @@ const ImportFamilySearch: React.FC<InspectorViewProps> = ({ prefix, onSelectionC
 
   return (
     <div className="h-full flex flex-col">
+      <div>
+        <Button
+          onPress={handleImport}
+          isLoading={isImporting}
+          color="warning"
+          isDisabled={!selectedItems.length}
+        >
+          Зберегти {selectedItems.length} вибраних записи(ів)
+        </Button>
+      </div>
       <InspectorTable
         columns={[
+          {
+            field: "parsed_full_code",
+            headerName: "Реквізити на перевірку",
+            cellRenderer: renderParseResultCell,
+            valueGetter: (params) =>
+              params.data.parsed_full_code ||
+              autoParseFSItem(params.data).join(", "),
+            type: "editableColumn",
+            editable: true,
+            width: 200,
+            cellClass: "bg-warning-900",
+            headerClass: "bg-warning-800",
+          },
+          {
+            field: "archival_reference",
+            headerName: "Archival Reference",
+            filter: true,
+            flex: 1,
+          },
+          {
+            field: "volume",
+            filter: true,
+            flex: 1,
+          },
+          {
+            field: "volumes",
+            filter: true,
+            flex: 1,
+          },
+          {
+            field: "title",
+            filter: true,
+          },
           {
             field: "dgs",
             headerName: "DGS",
@@ -109,41 +172,11 @@ const ImportFamilySearch: React.FC<InspectorViewProps> = ({ prefix, onSelectionC
               </Link>
             ),
           },
-          {
-            field: "archival_reference",
-            headerName: "Archival Reference",
-            filter: true,
-            flex: 1,
-          },
-          {
-            field: "volume",
-            filter: true,
-            flex: 1,
-          },
-          {
-            field: "volumes",
-            filter: true,
-            flex: 1,
-          },
-          {
-            field: "date",
-            filter: true,
-            flex: 1,
-          },
-          {
-            colId: "parsed",
-            headerName: "Розпізнано",
-            cellRenderer: renderParseResultCell,
-            valueGetter: (params) => autoParseFSItem(params.data).join(", "),
-            pinned: "right",
-            width: 200,
-            resizable: false,
-          },
         ]}
         isLoading={isLoading}
         rows={data || []}
+        onCellValueChanged={handleEdit}
         onFilterChanged={handleFilterChange}
-        onRowClick={setActiveItem}
         onSelectionChanged={handleSelectionChange}
       />
     </div>
