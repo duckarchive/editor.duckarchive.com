@@ -65,6 +65,9 @@ const fieldTypeToWhere = (fieldName: string, filterConfig: FilterModel) => {
     case "equals":
       where[fieldName] = filterValue;
       break;
+    case "notEqual":
+      where[fieldName] = { not: filterValue };
+      break;
     case "contains":
       where[fieldName] = { contains: filterValue, mode: "insensitive" };
       break;
@@ -122,7 +125,7 @@ export const buildWhereClause = (searchParams: URLSearchParams | string) => {
           const { type, filter } = (
             filterConfig.conditions as FilterModel[]
           )[0] as { type: string[]; filter: string[] };
-          console.log("combined conditions", filterConfig.conditions);
+          console.log("combined conditions", filterConfig);
           const conditions: FilterModel[] = type
             .map((_, idx) =>
               fieldTypeToWhere(fieldName, {
@@ -138,7 +141,7 @@ export const buildWhereClause = (searchParams: URLSearchParams | string) => {
           };
         } else {
           // single condition
-          console.log("single condition");
+          console.log("single condition", filterConfig);
           prismaWhere = {
             ...prismaWhere,
             ...fieldTypeToWhere(fieldName, filterConfig),

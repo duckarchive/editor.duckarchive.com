@@ -11,15 +11,23 @@ import { Link } from "@heroui/link";
 import { GetImportFamilySearchResponse } from "@/app/api/inspector/import-family-search/route";
 import { Button } from "@heroui/button";
 import { usePost } from "@/hooks/useApi";
+import { IoRepeat } from "react-icons/io5";
+import FindAndReplace from "@/components/find-and-replace";
 
 type TableItem = GetImportFamilySearchResponse[number];
+interface FindAndReplaceData {
+  find: string;
+  replace: string;
+}
 
 const renderParseResultCell = ({
   value,
   data,
+  findAndReplace,
 }: {
   value: string;
   data: TableItem;
+  findAndReplace?: FindAndReplaceData;
 }) => {
   if (value) {
     return value;
@@ -35,6 +43,17 @@ const renderParseResultCell = ({
   }
 };
 
+const getFullCode = (
+  value: string,
+  data: TableItem,
+  findAndReplace?: FindAndReplaceData
+) => {
+  const raw = value || autoParseFSItem(data).join(", ");
+  return findAndReplace
+    ? raw.replace(new RegExp(findAndReplace.find, "g"), findAndReplace.replace)
+    : raw;
+};
+
 interface InspectorViewProps {
   prefix: string;
   onSelectionChanged?: (items: BaseInstance[]) => void;
@@ -45,6 +64,7 @@ const ImportFamilySearch: React.FC<InspectorViewProps> = ({
   onSelectionChanged,
 }) => {
   const [filters, setFilters] = useState<FilterModel>({});
+  const [findAndReplace, setFindAndReplace] = useState<FindAndReplaceData>();
   const {
     data,
     error,
@@ -69,10 +89,6 @@ const ImportFamilySearch: React.FC<InspectorViewProps> = ({
     setFilters(newFilters);
   }, []);
 
-  const handleEdit = (newData: BaseInstance) => {
-    console.log("Edited item:", newData);
-  };
-
   const handleSelectionChange = useCallback(
     (items: BaseInstance[]) => {
       if (onSelectionChanged) {
@@ -86,10 +102,14 @@ const ImportFamilySearch: React.FC<InspectorViewProps> = ({
   const handleImport = async () => {
     const items = selectedItems.map((el: any) => ({
       ...el,
-      parsed_full_code: el.parsed_full_code || autoParseFSItem(el).join("-"),
+      parsed_full_code: getFullCode(el.parsed_full_code, el, findAndReplace),
     }));
     await importItems(items);
     await refresh();
+  };
+
+  const handleReplace = (find: string, replace: string) => {
+    setFindAndReplace({ find, replace });
   };
 
   if (error) {
@@ -98,25 +118,35 @@ const ImportFamilySearch: React.FC<InspectorViewProps> = ({
 
   return (
     <div className="h-full flex flex-col">
-      <div>
-        <Button
-          onPress={handleImport}
-          isLoading={isImporting}
-          color="warning"
-          isDisabled={!selectedItems.length}
-        >
-          Зберегти {selectedItems.length} вибраних записи(ів)
-        </Button>
+      <div className="flex justify-between">
+        <div>
+          <FindAndReplace
+            onReplace={handleReplace}
+          />
+        </div>
+        <div>
+          <Button
+            onPress={handleImport}
+            isLoading={isImporting}
+            color="success"
+            variant={selectedItems.length ? "solid" : "bordered"}
+            isDisabled={!selectedItems.length}
+          >
+            Зберегти {selectedItems.length} вибраних записи(ів)
+          </Button>
+        </div>
       </div>
       <InspectorTable
         columns={[
           {
             field: "parsed_full_code",
-            headerName: "Реквізити на перевірку",
+            headerName: "Реквізити",
             cellRenderer: renderParseResultCell,
-            valueGetter: (params) =>
-              params.data.parsed_full_code ||
-              autoParseFSItem(params.data).join(", "),
+            valueGetter: (params) => getFullCode(
+              params.data.parsed_full_code,
+              params.data,
+              findAndReplace
+            ),
             type: "editableColumn",
             editable: true,
             width: 200,
@@ -175,7 +205,6 @@ const ImportFamilySearch: React.FC<InspectorViewProps> = ({
         ]}
         isLoading={isLoading}
         rows={data || []}
-        onCellValueChanged={handleEdit}
         onFilterChanged={handleFilterChange}
         onSelectionChanged={handleSelectionChange}
       />
