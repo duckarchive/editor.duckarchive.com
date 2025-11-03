@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { inspectorPrisma } from "@/lib/db";
 import { Prisma } from "@/generated/prisma/inspector-client";
 import { parseDate } from "@/lib/parse";
-import { stringifyDBParams } from "@duckarchive/framework";
 
 export type FSItemsFreshResponse = Prisma.FamilySearchItemGetPayload<{
   include: {
@@ -146,7 +145,7 @@ export async function POST(request: NextRequest) {
             resource_id_case_id_api_params: {
               resource_id: FAMILY_SEARCH_RESOURCE_ID,
               case_id: updatedCaseItem.id,
-              api_params: stringifyDBParams({ dgs: item.dgs }),
+              api_params: { dgs: item.dgs },
             },
           },
           update: {
@@ -156,7 +155,7 @@ export async function POST(request: NextRequest) {
             resource_id: FAMILY_SEARCH_RESOURCE_ID,
             case_id: updatedCaseItem.id,
             api_url: "https://sg30p0.familysearch.org/service/records/storage/dascloud/das/v2/",
-            api_params: stringifyDBParams({ dgs: item.dgs }),
+            api_params: { dgs: item.dgs },
             url: `https://www.familysearch.org/en/records/images/search-results?imageGroupNumbers=${item.dgs}`,
           },
         });
