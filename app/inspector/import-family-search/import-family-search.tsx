@@ -150,7 +150,9 @@ const ImportFamilySearch: React.FC<InspectorViewProps> = ({
             type: "editableColumn",
             editable: true,
             width: 200,
-            cellClass: "bg-warning-900",
+            cellClass: ({ value }) => {
+              return value.includes("--") ? "bg-danger-900" : "bg-warning-900";
+            },
             headerClass: "bg-warning-800",
           },
           {
