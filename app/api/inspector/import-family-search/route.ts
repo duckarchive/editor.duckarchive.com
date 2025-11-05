@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
           },
         ],
       },
-      take: 1000,
+      take: 500,
       orderBy: { project_id: "desc" },
       include: {
         project: {
@@ -73,9 +73,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const flattenedItems = items.flatMap((item) => {
+      if (item.parsed_full_code.includes(", ")) {
+        return item.parsed_full_code
+          .split(", ")
+          .map((code) => ({ ...item, parsed_full_code: code }));
+      }
+      return [item];
+    });
+
     const results = [];
     // Process in parallel chunks
-    const chunks = chunk(items, 10);
+    const chunks = chunk(flattenedItems, 10);
     for (const chunk of chunks) {
       console.log("Processing chunk");
       await Promise.all(

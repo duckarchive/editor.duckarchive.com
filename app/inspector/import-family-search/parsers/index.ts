@@ -1,4 +1,6 @@
 import { FSItemsFreshResponse } from "@/app/api/inspector/fs-import/route";
+import { Parser } from "@/app/inspector/import-family-search/parsers/utils";
+import volumeParser from "@/app/inspector/import-family-search/parsers/volume.parser";
 import { parseCode } from "@duckarchive/framework";
 
 const latin2cyrillic = (str: string): string => {
@@ -87,60 +89,28 @@ const templates: {
   },
 ];
 
-export const parseMeta = (str: string): MetaItem[] => {
-  return str
-    .split(" -- ")
-    .map((itemStr) => {
-      let m = null;
-      for (const { test, match, pre, post } of templates) {
-        if (test.test(itemStr)) {
-          if (pre) {
-            m = pre(itemStr).match(match);
-          } else {
-            m = itemStr.match(match);
-          }
-          if (post) {
-            m = post(m);
-          }
-          break;
-        }
-      }
-
-      if (!m) {
-        console.error("Invalid meta", { text: itemStr });
-        return null;
-      }
-
-      const [_, f, d, c, ce] = m;
-
-      return {
-        raw: itemStr,
-        fund: f.trim(),
-        description: d.trim(),
-        casesRange: [c.trim(), ce?.slice(1).trim()],
-      };
-    })
-    .filter(Boolean) as MetaItem[];
-};
-
-
-const CYRILLIC = "[А-ЯҐЄІЇ]";
-const PREFIX = "[РПН]";
-const DELIMITER = "[ ,;./_–—―-]";
-const POSTFIX = "[A-ZА-ЯҐЄІЇ.]*";
-
-const regexps = [
-  new RegExp(
-    `(${PREFIX}?${DELIMITER}?\\d+${POSTFIX})${DELIMITER}(\\d+${POSTFIX})${DELIMITER}(\\d+${POSTFIX})`,
-    "i"
-  )
+const parsers: Parser[] = [
+  volumeParser,
+  // Volume 5593-2/779
+  // new RegExp(
+  //   `^Vol\\w{0,3}\\s*(${PREFIX}?${DELIMITER}?\\d+${POSTFIX})${DELIMITER}(\\d+${POSTFIX})${DELIMITER}(\\d+${POSTFIX})`,
+  //   "i"
+  // ),
+  // // universal single
+  // new RegExp(
+  //   `(${PREFIX}?${DELIMITER}?\\d+${POSTFIX})${DELIMITER}(\\d+${POSTFIX})${DELIMITER}(\\d+${POSTFIX})`,
+  //   "i"
+  // ),
 ];
 
 export const autoParseFSItem = (item?: FSItemsFreshResponse[number]): string[] => {
   if (!item) return [];
   const a = item.project.archive?.code || "";
+  const parser = parsers.find(({ test }) => test(item));
 
-  const [_, f, d, c] = (regexps.find((r) => r.test(item.volumes || ""))?.exec(item.volumes || "") || []).map(raw => parseCode(raw));
+  if (!parser) return [];
 
-  return [[a, f, d, c].join("-")];
+  // const [_, f, d, c] = parser.parse(item)?.map(raw => parseCode(raw)) || [];
+
+  return parser.parse(item).map((parts) => [a, ...parts.map(part => parseCode(part))].join("-"));
 };

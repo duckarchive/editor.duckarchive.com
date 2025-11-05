@@ -57,8 +57,8 @@ const InspectorTable: React.FC<InspectorTableProps> = memo(
         rows={rows}
         setActiveFilterId={() => {}}
         selectionColumnDef={{
-          cellClass: "bg-warning-900",
-          headerClass: "bg-warning-800",
+          cellClass: "bg-gray-100",
+          headerClass: "bg-gray-100",
         }}
         suppressHorizontalScroll={false}
         onCellValueChanged={handleCellValueChange}

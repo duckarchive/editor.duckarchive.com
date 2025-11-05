@@ -1,17 +1,15 @@
 "use client";
 
 import { FilterModel } from "ag-grid-community";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback } from "react";
 
 import { useAdmin } from "@/hooks/useAdmin";
 import InspectorTable from "@/components/inspector-table";
-import { diff } from "@/lib/algorithm";
-import { autoParseFSItem } from "@/app/inspector/import-family-search/parse";
+import { autoParseFSItem } from "@/app/inspector/import-family-search/parsers";
 import { Link } from "@heroui/link";
 import { GetImportFamilySearchResponse } from "@/app/api/inspector/import-family-search/route";
 import { Button } from "@heroui/button";
 import { usePost } from "@/hooks/useApi";
-import { IoRepeat } from "react-icons/io5";
 import FindAndReplace from "@/components/find-and-replace";
 
 type TableItem = GetImportFamilySearchResponse[number];
@@ -20,27 +18,21 @@ interface FindAndReplaceData {
   replace: string;
 }
 
-const renderParseResultCell = ({
-  value,
-  data,
-  findAndReplace,
-}: {
-  value: string;
-  data: TableItem;
-  findAndReplace?: FindAndReplaceData;
-}) => {
-  if (value) {
-    return value;
-  } else {
-    const parsed = autoParseFSItem(data);
-    return (
-      <>
-        {parsed.map((item) => (
-          <p key={`${data.dgs}-${item}`}>{item}</p>
-        ))}
-      </>
-    );
+const getCellClass = ({ value }: { value: string }) => {
+  let classNames = "text-wrap";
+  if (value.includes(", ")) {
+    // multiline
+    classNames += " leading-[1.3]";
   }
+  if (value.includes("--")) {
+    // invalid
+    classNames += " bg-danger-900";
+  } else {
+    // default
+    classNames += " bg-gray-100";
+  }
+
+  return classNames;
 };
 
 const getFullCode = (
@@ -120,9 +112,7 @@ const ImportFamilySearch: React.FC<InspectorViewProps> = ({
     <div className="h-full flex flex-col">
       <div className="flex justify-between">
         <div>
-          <FindAndReplace
-            onReplace={handleReplace}
-          />
+          <FindAndReplace onReplace={handleReplace} />
         </div>
         <div>
           <Button
@@ -141,19 +131,18 @@ const ImportFamilySearch: React.FC<InspectorViewProps> = ({
           {
             field: "parsed_full_code",
             headerName: "Реквізити",
-            cellRenderer: renderParseResultCell,
-            valueGetter: (params) => getFullCode(
-              params.data.parsed_full_code,
-              params.data,
-              findAndReplace
-            ),
+            valueGetter: (params) =>
+              getFullCode(
+                params.data.parsed_full_code,
+                params.data,
+                findAndReplace
+              ),
             type: "editableColumn",
             editable: true,
             width: 200,
-            cellClass: ({ value }) => {
-              return value.includes("--") ? "bg-danger-900" : "bg-warning-900";
-            },
-            headerClass: "bg-warning-800",
+            cellClass: getCellClass,
+            headerClass: "bg-gray-100",
+            autoHeight: true,
           },
           {
             field: "archival_reference",
