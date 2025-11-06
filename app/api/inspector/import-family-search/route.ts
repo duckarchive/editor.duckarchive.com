@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     const results = [];
     // Process in parallel chunks
-    const chunks = chunk(flattenedItems, 10);
+    const chunks = chunk(flattenedItems, 2);
     for (const chunk of chunks) {
       console.log("Processing chunk");
       await Promise.all(
@@ -98,6 +98,78 @@ export async function POST(request: NextRequest) {
           const archive_id = item.project.archive_id;
 
           if (!fCode || !dCode || !cCode) {
+            if (fCode && dCode && !cCode) {
+              // save description only
+              const transactionResult = await inspectorPrisma.$transaction(
+                async (prisma) => {
+                  // 1. Find or create Fund
+                  const fund = await prisma.fund.upsert({
+                    where: { code_archive_id: { code: fCode, archive_id } },
+                    update: {},
+                    create: { code: fCode, archive_id },
+                  });
+
+                  // 2. Find or create Description
+                  const description = await prisma.description.upsert({
+                    where: { code_fund_id: { code: dCode, fund_id: fund.id } },
+                    update: {},
+                    create: { code: dCode, fund_id: fund.id },
+                    include: {
+                      years: true,
+                    },
+                  });
+
+                  // 4. Upsert Match (caseOnlineCopy)
+                  const onlineCopy = await prisma.descriptionOnlineCopy.upsert({
+                    where: {
+                      resource_id_description_id_api_params: {
+                        resource_id: FAMILY_SEARCH_RESOURCE_ID,
+                        description_id: description.id,
+                        api_params: { dgs: item.dgs },
+                      },
+                    },
+                    update: {},
+                    create: {
+                      resource_id: FAMILY_SEARCH_RESOURCE_ID,
+                      description_id: description.id,
+                      api_url:
+                        "https://sg30p0.familysearch.org/service/records/storage/dascloud/das/v2/",
+                      api_params: { dgs: item.dgs },
+                      url: `https://www.familysearch.org/en/records/images/search-results?imageGroupNumbers=${item.dgs}`,
+                    },
+                  });
+
+                  // 5. Add DescriptionYears if needed
+                  if (description.years.length === 0 && item.date) {
+                    const { start_year, end_year } = parseDate(item.date);
+                    if (start_year && end_year) {
+                      await prisma.descriptionYear.create({
+                        data: {
+                          description_id: description.id,
+                          start_year,
+                          end_year,
+                        },
+                      });
+                    }
+                  }
+
+                  // 6. Update FamilySearchItem
+                  await prisma.familySearchItem.update({
+                    where: { id: item.id },
+                    data: {
+                      // set 1 min in future, to guarantee updated_at < cataloged_at
+                      cataloged_at: new Date(Date.now() + 1000 * 60 * 1),
+                    },
+                  });
+
+                  return { description, onlineCopy };
+                }
+              );
+
+              if (transactionResult) {
+                results.push(transactionResult);
+              }
+            }
             return; // Skip items with invalid data
           }
 
