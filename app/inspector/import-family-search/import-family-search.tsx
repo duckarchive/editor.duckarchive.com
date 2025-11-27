@@ -160,14 +160,14 @@ const ImportFamilySearch: React.FC<InspectorViewProps> = ({
             filter: true,
             flex: 1,
           },
-          {
-            field: "title",
-            filter: true,
-          },
+          // {
+          //   field: "title",
+          //   filter: true,
+          // },
           {
             field: "dgs",
             headerName: "DGS",
-            width: 120,
+            width: 150,
             cellRenderer: ({ value }: { value: string }) => (
               <Link
                 isExternal

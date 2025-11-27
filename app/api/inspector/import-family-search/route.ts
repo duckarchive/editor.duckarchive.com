@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     const results = [];
     // Process in parallel chunks
-    const chunks = chunk(flattenedItems, 2);
+    const chunks = chunk(flattenedItems, 10);
     for (const chunk of chunks) {
       console.log("Processing chunk");
       await Promise.all(
