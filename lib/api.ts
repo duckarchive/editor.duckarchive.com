@@ -63,10 +63,18 @@ const fieldTypeToWhere = (fieldName: string, filterConfig: FilterModel) => {
       where[fieldName] = { not: null };
       break;
     case "equals":
-      where[fieldName] = filterValue;
+      if (filterValue === '""' || filterValue === "''") {
+        where[fieldName] = { equals: "" };
+      } else {
+        where[fieldName] = filterValue;
+      }
       break;
     case "notEqual":
-      where[fieldName] = { not: filterValue };
+      if (filterValue === '""' || filterValue === "''") {
+        where[fieldName] = { not: "" };
+      } else {
+        where[fieldName] = { not: filterValue };
+      }
       break;
     case "contains":
       where[fieldName] = { contains: filterValue, mode: "insensitive" };

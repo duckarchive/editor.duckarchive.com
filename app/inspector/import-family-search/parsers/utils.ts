@@ -2,7 +2,8 @@ import { FSItemsFreshResponse } from "@/app/api/inspector/fs-import/route";
 
 export const CYRILLIC = "[А-ЯҐЄІЇ]";
 export const PREFIX = "[РПН]";
-export const DELIMITER = "[ ,;./_–—―-]";
+export const DASH = "–—―-";
+export const DELIMITER = `[ ,;./_${DASH}]`;
 export const POSTFIX = "[A-ZА-ЯҐЄІЇ.]*";
 
 export interface Parser {

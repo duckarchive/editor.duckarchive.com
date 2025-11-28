@@ -2,26 +2,31 @@ import {
   testItem,
   Parser,
   POSTFIX,
-  DELIMITER,
   DASH,
+  PREFIX,
 } from "@/app/inspector/import-family-search/parsers/utils";
 
-const DESCRIPTION = "о|o|оп|on|оn|oп";
-const CASES = "д|дел|c|спр|сп|cnp|cn|c|ekh|ex|ех";
+const P = `${PREFIX}{0,1}[${DASH}]{0,1}`;
 
 const singleRegexp = new RegExp(
-  `^ф\\.\\s*(\\d+${POSTFIX})${DELIMITER}+(${DESCRIPTION})\\.?${DELIMITER}+(\\d+${POSTFIX})${DELIMITER}+(${CASES})\\.?${DELIMITER}*(\\d+[${DASH}]*${POSTFIX})`,
+  `(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`,
   "i"
 );
 const rangeRegexp = new RegExp(
-  `^ф\\.\\s*(\\d+${POSTFIX})${DELIMITER}+(${DESCRIPTION})\\.?${DELIMITER}+(\\d+${POSTFIX})${DELIMITER}+(${CASES})\\.?${DELIMITER}*(\\d+[${DASH}]*${POSTFIX})${DELIMITER}+(\\d+[${DASH}]*${POSTFIX})`,
+  `(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`,
   "i"
 );
 
-const classicParser: Parser = {
-  example: "Ф. 2, о. 9, д. 120-123",
+const shortParser: Parser = {
+  example: "37-3-129",
   test: (item) =>
-    testItem(new RegExp(`^ф\\.?.+(${DESCRIPTION})\\.?.+(${CASES})`, "i"), item),
+    testItem(
+      new RegExp(
+        `^(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`,
+        "i"
+      ),
+      item
+    ),
   parse: (item) => {
     const toProcess: string[] = [];
     const multi = testItem(/;/, item);
@@ -35,11 +40,11 @@ const classicParser: Parser = {
 
     const results: string[][] = [];
     for (const part of toProcess) {
-      const clean = part.replace(/\s?-\s?/g, "-").trim();
+      const clean = part.replace(new RegExp(`\\s?[${DASH}]\\s?`, "g"), "-").trim();
       if (rangeRegexp.test(clean)) {
         const match = clean.match(rangeRegexp);
         if (!match) return [];
-        const [_, f, __, d, ___, cStart, cEnd] = match;
+        const [_, f, d, cStart, cEnd] = match;
         if (cEnd) {
           const startNum = parseInt(cStart.replace(/\D/g, ""), 10);
           const endNum = parseInt(cEnd.replace(/\D/g, ""), 10);
@@ -60,7 +65,7 @@ const classicParser: Parser = {
       } else if (singleRegexp.test(clean)) {
         const match = clean.match(singleRegexp);
         if (!match) return [];
-        const [_, f, __, d, ___, c] = match;
+        const [_, f, d, c] = match;
         results.push([f, d, c]);
       }
     }
@@ -69,4 +74,4 @@ const classicParser: Parser = {
   },
 };
 
-export default classicParser;
+export default shortParser;
