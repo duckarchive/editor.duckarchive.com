@@ -8,6 +8,10 @@ import {
 
 const P = `${PREFIX}{0,1}[${DASH}]{0,1}`;
 
+const descriptionRegexp = new RegExp(
+  `(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`,
+  "i"
+);
 const singleRegexp = new RegExp(
   `(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`,
   "i"
@@ -22,7 +26,7 @@ const shortParser: Parser = {
   test: (item) =>
     testItem(
       new RegExp(
-        `^(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`,
+        `^(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`,
         "i"
       ),
       item
@@ -34,7 +38,7 @@ const shortParser: Parser = {
       toProcess.push(...multi.split(";").map((s) => s.trim()));
     } else {
       toProcess.push(
-        testItem(singleRegexp, item) || testItem(rangeRegexp, item)
+        testItem(singleRegexp, item) || testItem(rangeRegexp, item) || testItem(descriptionRegexp, item)
       );
     }
 
@@ -67,6 +71,11 @@ const shortParser: Parser = {
         if (!match) return [];
         const [_, f, d, c] = match;
         results.push([f, d, c]);
+      } else if (descriptionRegexp.test(clean)) {
+        const match = clean.match(descriptionRegexp);
+        if (!match) return [];
+        const [_, f, d] = match;
+        results.push([f, d]);
       }
     }
 
