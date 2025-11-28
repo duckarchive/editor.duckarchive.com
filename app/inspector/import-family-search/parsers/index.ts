@@ -1,4 +1,5 @@
 import { FSItemsFreshResponse } from "@/app/api/inspector/fs-import/route";
+import classicParser from "@/app/inspector/import-family-search/parsers/classic.parser";
 import { Parser } from "@/app/inspector/import-family-search/parsers/utils";
 import volumeParser from "@/app/inspector/import-family-search/parsers/volume.parser";
 import { parseCode } from "@duckarchive/framework";
@@ -91,6 +92,7 @@ const templates: {
 
 const parsers: Parser[] = [
   volumeParser,
+  classicParser,
   // Volume 5593-2/779
   // new RegExp(
   //   `^Vol\\w{0,3}\\s*(${PREFIX}?${DELIMITER}?\\d+${POSTFIX})${DELIMITER}(\\d+${POSTFIX})${DELIMITER}(\\d+${POSTFIX})`,
