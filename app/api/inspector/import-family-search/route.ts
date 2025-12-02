@@ -62,6 +62,17 @@ type ImportItem = GetImportFamilySearchResponse[number] & {
 
 const FAMILY_SEARCH_RESOURCE_ID = "e106fff5-12bd-4023-bbf6-fbf58faaf1b7";
 
+// Cache key format: "archive_id|fund_code" or "archive_id|fund_code|description_code"
+interface CachedDescription {
+  id: string;
+  years: any[];
+}
+
+interface RequestCache {
+  fundIds: Map<string, string>;
+  descriptions: Map<string, CachedDescription>;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const items: ImportItem[] = await request.json();
@@ -73,22 +84,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const flattenedItems = items.flatMap((item) => {
-      if (item.parsed_full_code.includes(", ")) {
-        return item.parsed_full_code
-          .split(", ")
-          .map((code) => ({ ...item, parsed_full_code: code }));
-      }
-      return [item];
-    });
+    const flattenedItems = items
+      .flatMap((item) => {
+        if (item.parsed_full_code.includes(", ")) {
+          return item.parsed_full_code
+            .split(", ")
+            .map((code) => ({ ...item, parsed_full_code: code }));
+        }
+        return [item];
+      })
+      .sort(() => Math.random() - 0.5); // Shuffle items to reduce potential deadlocks
+
+    // Initialize request-level cache
+    const cache: RequestCache = {
+      fundIds: new Map(),
+      descriptions: new Map(),
+    };
 
     const results = [];
     // Process in parallel chunks
-    const chunks = chunk(flattenedItems, 10);
-    for (const chunk of chunks) {
-      console.log("Processing chunk");
+    let processedCount = 0;
+    const chunks = chunk(flattenedItems, 20);
+    for (const chunkData of chunks) {
+      console.log(`Processing chunk ${++processedCount}/${chunks.length}`);
       await Promise.all(
-        chunk.map(async (item, idx) => {
+        chunkData.map(async (item, idx) => {
           if (!item.parsed_full_code || !item.project?.archive_id) {
             return; // Skip items with invalid data
           }
@@ -102,24 +122,43 @@ export async function POST(request: NextRequest) {
               // save description only
               const transactionResult = await inspectorPrisma.$transaction(
                 async (prisma) => {
-                  // 1. Find or create Fund
-                  const fund = await prisma.fund.upsert({
-                    where: { code_archive_id: { code: fCode, archive_id } },
-                    update: {},
-                    create: { code: fCode, archive_id },
-                  });
+                  // Check cache for fund
+                  const fundCacheKey = `${archive_id}|${fCode}`;
+                  let fundId = cache.fundIds.get(fundCacheKey);
 
-                  // 2. Find or create Description
-                  const description = await prisma.description.upsert({
-                    where: { code_fund_id: { code: dCode, fund_id: fund.id } },
-                    update: {},
-                    create: { code: dCode, fund_id: fund.id },
-                    include: {
-                      years: true,
-                    },
-                  });
+                  if (!fundId) {
+                    // 1. Find or create Fund
+                    const fund = await prisma.fund.upsert({
+                      where: { code_archive_id: { code: fCode, archive_id } },
+                      update: {},
+                      create: { code: fCode, archive_id },
+                    });
+                    fundId = fund.id;
+                    cache.fundIds.set(fundCacheKey, fundId);
+                  }
 
-                  // 4. Upsert Match (caseOnlineCopy)
+                  // Check cache for description
+                  const descCacheKey = `${archive_id}|${fCode}|${dCode}`;
+                  let description = cache.descriptions.get(descCacheKey);
+
+                  if (!description) {
+                    // 2. Find or create Description
+                    const upsertedDesc = await prisma.description.upsert({
+                      where: { code_fund_id: { code: dCode, fund_id: fundId } },
+                      update: {},
+                      create: { code: dCode, fund_id: fundId },
+                      include: {
+                        years: true,
+                      },
+                    });
+                    description = {
+                      id: upsertedDesc.id,
+                      years: upsertedDesc.years,
+                    };
+                    cache.descriptions.set(descCacheKey, description);
+                  }
+
+                  // 3. Upsert Match (descriptionOnlineCopy)
                   const onlineCopy = await prisma.descriptionOnlineCopy.upsert({
                     where: {
                       resource_id_description_id_api_params: {
@@ -139,7 +178,7 @@ export async function POST(request: NextRequest) {
                     },
                   });
 
-                  // 5. Add DescriptionYears if needed
+                  // 4. Add DescriptionYears if needed
                   if (description.years.length === 0 && item.date) {
                     const { start_year, end_year } = parseDate(item.date);
                     if (start_year && end_year) {
@@ -150,10 +189,12 @@ export async function POST(request: NextRequest) {
                           end_year,
                         },
                       });
+                      // Update cache to reflect that years were added
+                      description.years.push({ start_year, end_year });
                     }
                   }
 
-                  // 6. Update FamilySearchItem
+                  // 5. Update FamilySearchItem
                   await prisma.familySearchItem.update({
                     where: { id: item.id },
                     data: {
@@ -175,26 +216,47 @@ export async function POST(request: NextRequest) {
 
           const transactionResult = await inspectorPrisma.$transaction(
             async (prisma) => {
-              // 1. Find or create Fund
-              const fund = await prisma.fund.upsert({
-                where: { code_archive_id: { code: fCode, archive_id } },
-                update: {},
-                create: { code: fCode, archive_id },
-              });
+              // Check cache for fund
+              const fundCacheKey = `${archive_id}|${fCode}`;
+              let fundId = cache.fundIds.get(fundCacheKey);
 
-              // 2. Find or create Description
-              const description = await prisma.description.upsert({
-                where: { code_fund_id: { code: dCode, fund_id: fund.id } },
-                update: {},
-                create: { code: dCode, fund_id: fund.id },
-              });
+              if (!fundId) {
+                // 1. Find or create Fund
+                const fund = await prisma.fund.upsert({
+                  where: { code_archive_id: { code: fCode, archive_id } },
+                  update: {},
+                  create: { code: fCode, archive_id },
+                });
+                fundId = fund.id;
+                cache.fundIds.set(fundCacheKey, fundId);
+              }
+
+              // Check cache for description
+              const descCacheKey = `${archive_id}|${fCode}|${dCode}`;
+              let cachedDesc = cache.descriptions.get(descCacheKey);
+              let descriptionId: string;
+
+              if (!cachedDesc) {
+                // 2. Find or create Description
+                const upsertedDesc = await prisma.description.upsert({
+                  where: { code_fund_id: { code: dCode, fund_id: fundId } },
+                  update: {},
+                  create: { code: dCode, fund_id: fundId },
+                  include: {
+                    years: true,
+                  },
+                });
+                cachedDesc = { id: upsertedDesc.id, years: upsertedDesc.years };
+                cache.descriptions.set(descCacheKey, cachedDesc);
+              }
+              descriptionId = cachedDesc.id;
 
               // 3. Find or create Case
               const caseItem = await prisma.case.upsert({
                 where: {
                   code_description_id: {
                     code: cCode,
-                    description_id: description.id,
+                    description_id: descriptionId,
                   },
                 },
                 update: {
@@ -202,7 +264,7 @@ export async function POST(request: NextRequest) {
                 },
                 create: {
                   code: cCode,
-                  description_id: description.id,
+                  description_id: descriptionId,
                   title: item.title,
                 },
                 include: {
