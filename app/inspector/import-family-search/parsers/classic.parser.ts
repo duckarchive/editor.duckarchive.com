@@ -6,22 +6,23 @@ import {
   DASH,
 } from "@/app/inspector/import-family-search/parsers/utils";
 
-const DESCRIPTION = "о|o|оп|on|оn|oп";
-const CASES = "д|дел|c|спр|сп|cnp|cn|c|ekh|ex|ех";
+const FUND = "f|ф";
+const DESCRIPTION = "о|o|оп|on|оn|oп|op";
+const CASES = "д|дел|d|c|спр|сп|cnp|cn|c|ekh|ex|ех";
 
 const singleRegexp = new RegExp(
-  `^ф\\.\\s*(\\d+${POSTFIX})${DELIMITER}+(${DESCRIPTION})\\.?${DELIMITER}+(\\d+${POSTFIX})${DELIMITER}+(${CASES})\\.?${DELIMITER}*(\\d+[${DASH}]*${POSTFIX})`,
+  `^(${FUND})\\.\\s*(\\d+${POSTFIX})${DELIMITER}+(${DESCRIPTION})\\.?${DELIMITER}+(\\d+${POSTFIX})${DELIMITER}+(${CASES})\\.?${DELIMITER}*(\\d+[${DASH}]*${POSTFIX})`,
   "i"
 );
 const rangeRegexp = new RegExp(
-  `^ф\\.\\s*(\\d+${POSTFIX})${DELIMITER}+(${DESCRIPTION})\\.?${DELIMITER}+(\\d+${POSTFIX})${DELIMITER}+(${CASES})\\.?${DELIMITER}*(\\d+[${DASH}]*${POSTFIX})${DELIMITER}+(\\d+[${DASH}]*${POSTFIX})`,
+  `^(${FUND})\\.\\s*(\\d+${POSTFIX})${DELIMITER}+(${DESCRIPTION})\\.?${DELIMITER}+(\\d+${POSTFIX})${DELIMITER}+(${CASES})\\.?${DELIMITER}*(\\d+[${DASH}]*${POSTFIX})${DELIMITER}+(\\d+[${DASH}]*${POSTFIX})`,
   "i"
 );
 
 const classicParser: Parser = {
   example: "Ф. 2, о. 9, д. 120-123",
   test: (item) =>
-    testItem(new RegExp(`^ф\\.?.+(${DESCRIPTION})\\.?.+(${CASES})`, "i"), item),
+    testItem(new RegExp(`^(${FUND})\\.?.+(${DESCRIPTION})\\.?.+(${CASES})`, "i"), item),
   parse: (item) => {
     const toProcess: string[] = [];
     const multi = testItem(/;/, item);
@@ -60,7 +61,7 @@ const classicParser: Parser = {
       } else if (singleRegexp.test(clean)) {
         const match = clean.match(singleRegexp);
         if (!match) return [];
-        const [_, f, __, d, ___, c] = match;
+        const [_, __, f, ___, d, ____, c] = match;
         results.push([f, d, c]);
       }
     }
