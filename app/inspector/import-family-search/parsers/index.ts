@@ -118,5 +118,5 @@ export const autoParseFSItem = (item?: FSItemsFreshResponse[number]): string[] =
 
   // const [_, f, d, c] = parser.parse(item)?.map(raw => parseCode(raw)) || [];
 
-  return parser.parse(item).map((parts) => [a, ...parts.map(part => parseCode(part))].join("-"));
+  return parser.parse(item).map((parts) => [a, ...parts.map(part => parseCode(part, true))].join("-"));
 };
