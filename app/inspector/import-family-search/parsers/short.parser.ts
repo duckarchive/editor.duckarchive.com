@@ -26,7 +26,7 @@ const shortParser: Parser = {
   test: (item) =>
     testItem(
       new RegExp(
-        `^(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`,
+        `^\\s?(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`,
         "i"
       ),
       item

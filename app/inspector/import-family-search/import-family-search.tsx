@@ -9,8 +9,9 @@ import { autoParseFSItem } from "@/app/inspector/import-family-search/parsers";
 import { Link } from "@heroui/link";
 import { GetImportFamilySearchResponse } from "@/app/api/inspector/import-family-search/route";
 import { Button } from "@heroui/button";
-import { usePost } from "@/hooks/useApi";
+import { usePost, usePut } from "@/hooks/useApi";
 import FindAndReplace from "@/components/find-and-replace";
+import { buildQueryString } from "@/lib/api";
 
 type TableItem = GetImportFamilySearchResponse[number];
 interface FindAndReplaceData {
@@ -75,6 +76,11 @@ const ImportFamilySearch: React.FC<InspectorViewProps> = ({
     "/api/inspector/import-family-search"
   );
 
+  const queryString = buildQueryString(filters || {});
+  const { trigger: fullImportItems, isMutating: isFullImporting } = usePut<any, any>(
+    `/api/inspector/import-family-search${queryString}`
+  );
+
   const [selectedItems, setSelectedItems] = useState<TableItem[]>([]);
 
   const handleFilterChange = useCallback((newFilters: FilterModel) => {
@@ -100,6 +106,11 @@ const ImportFamilySearch: React.FC<InspectorViewProps> = ({
     await refresh();
   };
 
+  const handleFullImport = async () => {
+    await fullImportItems();
+    await refresh();
+  };
+
   const handleReplace = (find: string, replace: string) => {
     setFindAndReplace({ find, replace });
   };
@@ -114,7 +125,7 @@ const ImportFamilySearch: React.FC<InspectorViewProps> = ({
         <div>
           <FindAndReplace onReplace={handleReplace} />
         </div>
-        <div>
+        <div className="flex gap-2">
           <Button
             onPress={handleImport}
             isLoading={isImporting}
@@ -123,6 +134,13 @@ const ImportFamilySearch: React.FC<InspectorViewProps> = ({
             isDisabled={!selectedItems.length}
           >
             Зберегти {selectedItems.length} вибраних записи(ів)
+          </Button>
+          <Button
+            onPress={handleFullImport}
+            isLoading={isFullImporting}
+            color="warning"
+          >
+            Зберегти всі записи
           </Button>
         </div>
       </div>

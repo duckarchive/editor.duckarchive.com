@@ -95,18 +95,8 @@ const templates: {
 const parsers: Parser[] = [
   // tempParser,
   volumeParser,
-  classicParser,
   shortParser,
-  // Volume 5593-2/779
-  // new RegExp(
-  //   `^Vol\\w{0,3}\\s*(${PREFIX}?${DELIMITER}?\\d+${POSTFIX})${DELIMITER}(\\d+${POSTFIX})${DELIMITER}(\\d+${POSTFIX})`,
-  //   "i"
-  // ),
-  // // universal single
-  // new RegExp(
-  //   `(${PREFIX}?${DELIMITER}?\\d+${POSTFIX})${DELIMITER}(\\d+${POSTFIX})${DELIMITER}(\\d+${POSTFIX})`,
-  //   "i"
-  // ),
+  classicParser,
 ];
 
 export const autoParseFSItem = (item?: FSItemsFreshResponse[number]): string[] => {
