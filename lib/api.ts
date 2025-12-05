@@ -79,6 +79,9 @@ const fieldTypeToWhere = (fieldName: string, filterConfig: FilterModel) => {
     case "contains":
       where[fieldName] = { contains: filterValue, mode: "insensitive" };
       break;
+    case "notContains":
+      where[fieldName] = { not: { contains: filterValue } };
+      break;
     case "startsWith":
       where[fieldName] = { startsWith: filterValue, mode: "insensitive" };
       break;

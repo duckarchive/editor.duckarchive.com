@@ -1,5 +1,6 @@
 import { FSItemsFreshResponse } from "@/app/api/inspector/fs-import/route";
 import classicParser from "@/app/inspector/import-family-search/parsers/classic.parser";
+import shortWithLatinPrefixParser from "@/app/inspector/import-family-search/parsers/short-with-latin-prefix.parser";
 import shortParser from "@/app/inspector/import-family-search/parsers/short.parser";
 import tempParser from "@/app/inspector/import-family-search/parsers/temp.parser";
 import { Parser } from "@/app/inspector/import-family-search/parsers/utils";
@@ -96,6 +97,7 @@ const parsers: Parser[] = [
   // tempParser,
   volumeParser,
   shortParser,
+  shortWithLatinPrefixParser,
   classicParser,
 ];
 

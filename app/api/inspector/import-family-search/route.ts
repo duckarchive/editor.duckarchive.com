@@ -90,32 +90,62 @@ interface CTree {
 }
 
 const processByQueryParams = async (qp: URLSearchParams) => {
-  const where = buildWhereClause(qp);
+  // const where = buildWhereClause(qp);
 
-  const dbItems = await inspectorPrisma.familySearchItem.findMany({
-    where: {
-      ...where,
-      OR: [
-        {
-          updated_at: {
-            gt: inspectorPrisma.familySearchItem.fields.cataloged_at,
-          },
+  // const dbItems = await inspectorPrisma.familySearchItem.findMany({
+  //   where: {
+  //     ...where,
+  //     OR: [
+  //       {
+  //         updated_at: {
+  //           gt: inspectorPrisma.familySearchItem.fields.cataloged_at,
+  //         },
+  //       },
+  //       {
+  //         cataloged_at: null,
+  //       },
+  //     ],
+  //   },
+  //   take: 500,
+  //   orderBy: { updated_at: "desc" },
+  //   include: {
+  //     project: {
+  //       include: {
+  //         archive: true,
+  //       },
+  //     },
+  //   },
+  // });
+
+  const _dbItems = await inspectorPrisma.$queryRaw<any[]>`
+    SELECT
+      fsi.*,
+      fsp.archive_id AS project_archive_id,
+      a.code AS project_archive_code
+    FROM "family_search_items" fsi
+    LEFT JOIN "family_search_projects" fsp
+      ON fsi.project_id = fsp.id
+    LEFT JOIN "archives" a
+      ON fsp.archive_id = a.id
+    WHERE (
+      fsi.updated_at > fsi.cataloged_at
+      OR fsi.cataloged_at IS NULL
+    )
+      AND fsi.volumes ~ '^Р-9106-\\d+-к'
+    ORDER BY fsi.updated_at DESC
+    LIMIT 5000
+  `;
+
+  const dbItems = _dbItems.map(
+    ({ project_archive_id, project_archive_code, ...item }) =>
+      ({
+        ...item,
+        project: {
+          archive_id: project_archive_id,
+          archive: { code: project_archive_code },
         },
-        {
-          cataloged_at: null,
-        },
-      ],
-    },
-    take: 500,
-    orderBy: { updated_at: "desc" },
-    include: {
-      project: {
-        include: {
-          archive: true,
-        },
-      },
-    },
-  });
+      }) as ImportItem
+  );
 
   const items: ImportItem[] = dbItems.map(
     (item) =>
@@ -168,7 +198,7 @@ const processByQueryParams = async (qp: URLSearchParams) => {
   const catalogedItemIds: string[] = [];
 
   // Step 1: Process all funds
-  console.log("Step 1: Upserting funds...");
+  console.time("Step 1: Upserted funds");
   const fundsToProcess: Array<{ archiveId: string; fundCode: string }> = [];
 
   for (const archiveId in casesTree) {
@@ -207,10 +237,10 @@ const processByQueryParams = async (qp: URLSearchParams) => {
       })
     );
   }
-  console.log(`Step 1: Completed upserting funds`);
+  console.timeEnd("Step 1: Upserted funds");
 
   // Step 2: Process all descriptions
-  console.log("Step 2: Upserting descriptions...");
+  console.time("Step 2: Upserted descriptions");
   const descriptionsToProcess: Array<{
     archiveId: string;
     fundCode: string;
@@ -259,10 +289,10 @@ const processByQueryParams = async (qp: URLSearchParams) => {
       })
     );
   }
-  console.log(`Step 2: Completed upserting descriptions`);
+  console.timeEnd("Step 2: Upserted descriptions");
 
   // Step 3: Process descriptions
-  console.log("Step 3: Processing descriptions...");
+  console.time("Step 3: Completed descriptions");
   const descriptionItems: Array<{
     archiveId: string;
     fundCode: string;
@@ -328,10 +358,10 @@ const processByQueryParams = async (qp: URLSearchParams) => {
       })
     );
   }
-  console.log(`Step 3: Completed processing descriptions`);
+  console.timeEnd("Step 3: Completed descriptions");
 
   // Step 4: Process cases
-  console.log("Step 4: Processing cases...");
+  console.time("Step 4: Completed cases");
   const caseItems: Array<{
     archiveId: string;
     fundCode: string;
@@ -348,9 +378,7 @@ const processByQueryParams = async (qp: URLSearchParams) => {
         const descriptionId = descriptionIds.get(descCacheKey);
 
         if (!descriptionId) {
-          console.warn(
-            `Step 4: Description not found for key ${descCacheKey}`
-          );
+          console.warn(`Step 4: Description not found for key ${descCacheKey}`);
           continue;
         }
 
@@ -371,7 +399,7 @@ const processByQueryParams = async (qp: URLSearchParams) => {
 
   console.log(caseItems.length);
 
-  const caseChunks = chunk(caseItems, 10);
+  const caseChunks = chunk(caseItems, 30);
   let caseCount = 0;
   for (const caseChunk of caseChunks) {
     await Promise.all(
@@ -414,11 +442,7 @@ const processByQueryParams = async (qp: URLSearchParams) => {
         });
 
         // Add years if needed
-        const existingYears = await inspectorPrisma.caseYear.findMany({
-          where: { case_id: caseItem.id },
-        });
-
-        if (existingYears.length === 0 && data.years) {
+        if (caseItem.years.length === 0 && data.years) {
           const { start_year, end_year } = parseDate(data.years);
           if (start_year && end_year) {
             await inspectorPrisma.caseYear.create({
@@ -436,7 +460,7 @@ const processByQueryParams = async (qp: URLSearchParams) => {
     );
     caseCount += caseChunk.length;
   }
-  console.log(`Step 4: Completed processing ${caseCount} cases`);
+  console.timeEnd(`Step 4: Completed cases`);
 
   // Step 5: Update cataloged_at for all processed items
   if (catalogedItemIds.length > 0) {
@@ -463,7 +487,9 @@ export async function PUT(request: NextRequest) {
     do {
       count = await processByQueryParams(searchParams);
       totalCount += count;
-      console.log(`[PUT] Processed ${count} items in this iteration. Total: ${totalCount}`);
+      console.log(
+        `[PUT] Processed ${count} items in this iteration. Total: ${totalCount}`
+      );
     } while (count > 0);
 
     console.log(

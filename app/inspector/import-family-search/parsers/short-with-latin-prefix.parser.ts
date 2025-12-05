@@ -7,26 +7,27 @@ import {
 } from "@/app/inspector/import-family-search/parsers/utils";
 
 const P = `${PREFIX}{0,1}[${DASH}]{0,1}`;
+const LATIN_PREFIX = "F\\.?\\s*";
 
 const descriptionRegexp = new RegExp(
-  `(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`,
+  `${LATIN_PREFIX}(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`,
   "i"
 );
 const singleRegexp = new RegExp(
-  `(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})[${DASH}]+(\\d+\\s{0,1}${POSTFIX})`,
+  `${LATIN_PREFIX}(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`,
   "i"
 );
 const rangeRegexp = new RegExp(
-  `(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})[${DASH}]+(\\d+\\s{0,1}${POSTFIX})[${DASH}]+(\\d+\\s{0,1}${POSTFIX})`,
+  `${LATIN_PREFIX}(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`,
   "i"
 );
 
-const shortParser: Parser = {
+const shortWithLatinPrefixParser: Parser = {
   example: "37-3-129",
   test: (item) =>
     testItem(
       new RegExp(
-        `^\\s?(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`,
+        `^\\s?${LATIN_PREFIX}(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`,
         "i"
       ),
       item
@@ -83,4 +84,4 @@ const shortParser: Parser = {
   },
 };
 
-export default shortParser;
+export default shortWithLatinPrefixParser;
