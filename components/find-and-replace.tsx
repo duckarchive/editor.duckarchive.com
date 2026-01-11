@@ -44,7 +44,14 @@ const FindAndReplace: React.FC<FindAndReplaceProps> = ({
       </Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalContent>
-          <ModalHeader>Знайти та замінити</ModalHeader>
+          <ModalHeader className="flex flex-col gap-1">
+            Знайти та замінити
+            <p className="font-medium text-xs text-foreground">
+              Використовуйте цю функцію, щоб знайти та замінити текст в колонці
+              "Реквізити", перед збереженням. Допомагає в ситуаціях, коли
+              реквізити масово вказані неправильно на боці ФС.
+            </p>
+          </ModalHeader>
           <ModalBody>
             <div className="space-y-4">
               <Input
@@ -60,7 +67,7 @@ const FindAndReplace: React.FC<FindAndReplaceProps> = ({
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button color="secondary" onPress={onClose}>
+            <Button variant="bordered" onPress={onClose}>
               Скасувати
             </Button>
             <Button color="primary" onPress={handleReplace}>
