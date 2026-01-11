@@ -94,7 +94,7 @@ const templates: {
 ];
 
 const parsers: Parser[] = [
-  tempParser,
+  // tempParser,
   volumeParser,
   shortParser,
   shortWithLatinPrefixParser,
