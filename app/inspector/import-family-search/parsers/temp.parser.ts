@@ -9,19 +9,19 @@ const DESCRIPTION = "о|o|оп|on|оn|oп";
 const CASES = "д|дел|c|спр|сп|cnp|cn|c|ekh|ex|ех";
 
 const singleRegexp = new RegExp(
-  `^ф${DELIMITER}+95801${DELIMITER}+(${CASES})\\.?${DELIMITER}*(\\d+[–—―-]*${POSTFIX})`,
+  `^\\s*(\\d+)`,
   "i"
 );
 
 const tempParser: Parser = {
   example: "dev purposes only",
   test: (item) =>
-    testItem(new RegExp(`^ф\\.`, "i"), item),
+    testItem(new RegExp(`^\\d+`, "i"), item),
   parse: (item) => {
     const toProcess: string[] = [];
-    const multi = testItem(/;/, item);
+    const multi = testItem(/\./, item);
     if (multi && !item.dgs.includes("_")) {
-      toProcess.push(...multi.split(";").map((s) => s.trim()));
+      toProcess.push(...multi.split(".").map((s) => s.trim()));
     } else {
       toProcess.push(
         testItem(singleRegexp, item)
@@ -34,8 +34,8 @@ const tempParser: Parser = {
       if (singleRegexp.test(clean)) {
         const match = clean.match(singleRegexp);
         if (!match) return [];
-        const [_, ___, c] = match;
-        results.push(["958", "1", c]);
+        const [_, c] = match;
+        results.push(["БІБЛ", "1", c]);
       }
     }
 

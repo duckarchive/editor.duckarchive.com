@@ -5,7 +5,7 @@ import shortParser from "@/app/inspector/import-family-search/parsers/short.pars
 import tempParser from "@/app/inspector/import-family-search/parsers/temp.parser";
 import { Parser } from "@/app/inspector/import-family-search/parsers/utils";
 import volumeParser from "@/app/inspector/import-family-search/parsers/volume.parser";
-import { parseCode } from "@duckarchive/framework";
+import { parseCode } from "@duckarchive/utils";
 
 const latin2cyrillic = (str: string): string => {
   const charMap: Record<string, string> = {
@@ -94,14 +94,16 @@ const templates: {
 ];
 
 const parsers: Parser[] = [
-  // tempParser,
+  tempParser,
   volumeParser,
   shortParser,
   shortWithLatinPrefixParser,
   classicParser,
 ];
 
-export const autoParseFSItem = (item?: FSItemsFreshResponse[number]): string[] => {
+export const autoParseFSItem = (
+  item?: FSItemsFreshResponse[number]
+): string[] => {
   if (!item) return [];
   const a = item.project.archive?.code || "";
   const parser = parsers.find(({ test }) => test(item));
@@ -110,5 +112,9 @@ export const autoParseFSItem = (item?: FSItemsFreshResponse[number]): string[] =
 
   // const [_, f, d, c] = parser.parse(item)?.map(raw => parseCode(raw)) || [];
 
-  return parser.parse(item).map((parts) => [a, ...parts.map(part => parseCode(part, true))].join("-"));
+  return parser
+    .parse(item)
+    .map((parts) =>
+      [a, ...parts.map((part) => parseCode(part, true))].join("-")
+    );
 };

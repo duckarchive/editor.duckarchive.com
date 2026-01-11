@@ -6,7 +6,7 @@ import {
   PREFIX,
 } from "@/app/inspector/import-family-search/parsers/utils";
 
-const P = `${PREFIX}{0,1}[${DASH}]{0,1}`;
+const P = `${PREFIX}{0,1}\\s*[${DASH}\\s]{0,1}`;
 
 const descriptionRegexp = new RegExp(
   `(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`,
@@ -25,10 +25,7 @@ const shortParser: Parser = {
   example: "37-3-129",
   test: (item) =>
     testItem(
-      new RegExp(
-        `^\\s?(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`,
-        "i"
-      ),
+      new RegExp(`^\\s*(${P}\\d+${POSTFIX})[${DASH}]+(\\d+${POSTFIX})`, "i"),
       item
     ),
   parse: (item) => {
@@ -38,21 +35,32 @@ const shortParser: Parser = {
       toProcess.push(...multi.split(";").map((s) => s.trim()));
     } else {
       toProcess.push(
-        testItem(singleRegexp, item) || testItem(rangeRegexp, item) || testItem(descriptionRegexp, item)
+        testItem(singleRegexp, item) ||
+          testItem(rangeRegexp, item) ||
+          testItem(descriptionRegexp, item)
       );
     }
 
     const results: string[][] = [];
     for (const part of toProcess) {
-      const clean = part.replace(new RegExp(`\\s?[${DASH}]\\s?`, "g"), "-").trim();
+      const clean = part
+        .replace(new RegExp(`\\s?[${DASH}]\\s?`, "g"), "-")
+        .trim();
       if (rangeRegexp.test(clean)) {
         const match = clean.match(rangeRegexp);
         if (!match) return [];
-        const [_, f, d, cStart, cEnd] = match;
+        const [_, _f, d, cStart, cEnd] = match;
+        const f = _f
+          .replace(/^P/i, "Р")
+          .replace(/^N/i, "П")
+          .replace(/^H/i, "Н");
         if (cEnd) {
           const startNum = parseInt(cStart.replace(/\D/g, ""), 10);
           const endNum = parseInt(cEnd.replace(/\D/g, ""), 10);
-          if (endNum <= startNum) {
+          if (
+            endNum <= startNum ||
+            endNum - startNum > (item.image_count || 0)
+          ) {
             // it means it's not a range, it's a volume of same case
             results.push([f, d, cStart]);
             // results.push([f, d, `${cStart}Т${cEnd}`]);
@@ -69,7 +77,11 @@ const shortParser: Parser = {
       } else if (singleRegexp.test(clean)) {
         const match = clean.match(singleRegexp);
         if (!match) return [];
-        const [_, f, d, c] = match;
+        const [_, _f, d, c] = match;
+        const f = _f
+          .replace(/^P/i, "Р")
+          .replace(/^N/i, "П")
+          .replace(/^H/i, "Н");
         results.push([f, d, c]);
       } else if (descriptionRegexp.test(clean)) {
         const match = clean.match(descriptionRegexp);
