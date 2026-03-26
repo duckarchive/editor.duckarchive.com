@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { inspectorPrisma } from "@/lib/db";
-import { Author } from "@generated/prisma/inspector-client";
+import { Author } from "@generated/prisma/inspector/client/client";
 
 export async function POST(request: NextRequest) {
   try {

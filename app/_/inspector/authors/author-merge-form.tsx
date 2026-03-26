@@ -4,7 +4,7 @@ import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import CoordinatesInput from "@/components/coordinates-input";
 import { useEffect, useState } from "react";
-import { Author } from "@generated/prisma/inspector-client";
+import { Author } from "@generated/prisma/inspector/client/client";
 import TagInput from "@/components/tag-input";
 
 interface AuthorMergeFormProps {

@@ -1,7 +1,7 @@
 import { NextPage } from "next";
 
 import { inspectorPrisma } from "@/lib/db";
-import { Prisma } from "@generated/prisma/inspector-client";
+import { Prisma } from "@generated/prisma/inspector/client/client";
 import prisma2agGrid from "@/lib/prisma-to-aggrid";
 import InspectorView from "@/components/inspector-view";
 

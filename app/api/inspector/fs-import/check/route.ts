@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { inspectorPrisma } from "@/lib/db";
-import { Prisma } from "@generated/prisma/inspector-client";
+import { Prisma } from "@generated/prisma/inspector/client/client";
 
 // Re-defining the type from the payload, as it's not directly available
 // This should be kept in sync with the actual FamilySearchItem type

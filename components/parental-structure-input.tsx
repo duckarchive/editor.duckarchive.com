@@ -1,5 +1,5 @@
 import SelectArchive from "@/components/select-archive";
-import { Archive } from "@generated/prisma/inspector-client";
+import { Archive } from "@generated/prisma/inspector/client/client";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
 import {

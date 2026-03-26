@@ -13,7 +13,7 @@ import { IoAdd } from "react-icons/io5";
 
 import InspectorPanelForm from "./inspector-panel-form";
 import InspectorCaseForm from "@/app/_/inspector/cases/form";
-import { Archive, Author } from "@generated/prisma/inspector-client";
+import { Archive, Author } from "@generated/prisma/inspector/client/client";
 
 interface InspectorPanelProps {
   archives: Archive[];

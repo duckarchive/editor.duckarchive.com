@@ -1,5 +1,5 @@
 import { autoParseFSItem } from "@/app/inspector/import-family-search/parsers";
-import { Prisma } from "@generated/prisma/inspector-client";
+import { Prisma } from "@generated/prisma/inspector/client/client";
 import { buildWhereClause } from "@/lib/api";
 import { inspectorPrisma } from "@/lib/db";
 import { parseDate } from "@/lib/parse";
@@ -319,19 +319,16 @@ const processByQueryParams = async (qp: URLSearchParams) => {
         // Upsert descriptionOnlineCopy
         await inspectorPrisma.descriptionOnlineCopy.upsert({
           where: {
-            resource_id_description_id_api_params: {
+            resource_id_description_id_url: {
               resource_id: FAMILY_SEARCH_RESOURCE_ID,
               description_id: descriptionId,
-              api_params: { dgs: data.dgs },
+              url: `https://www.familysearch.org/en/records/images/search-results?imageGroupNumbers=${data.dgs}`,
             },
           },
           update: {},
           create: {
             resource_id: FAMILY_SEARCH_RESOURCE_ID,
             description_id: descriptionId,
-            api_url:
-              "https://sg30p0.familysearch.org/service/records/storage/dascloud/das/v2/",
-            api_params: { dgs: data.dgs },
             url: `https://www.familysearch.org/en/records/images/search-results?imageGroupNumbers=${data.dgs}`,
           },
         });
@@ -424,19 +421,16 @@ const processByQueryParams = async (qp: URLSearchParams) => {
         // Upsert caseOnlineCopy
         await inspectorPrisma.caseOnlineCopy.upsert({
           where: {
-            resource_id_case_id_api_params: {
+            resource_id_case_id_url: {
               resource_id: FAMILY_SEARCH_RESOURCE_ID,
               case_id: caseItem.id,
-              api_params: { dgs: data.dgs },
+              url: `https://www.familysearch.org/en/records/images/search-results?imageGroupNumbers=${data.dgs}`,
             },
           },
           update: {},
           create: {
             resource_id: FAMILY_SEARCH_RESOURCE_ID,
             case_id: caseItem.id,
-            api_url:
-              "https://sg30p0.familysearch.org/service/records/storage/dascloud/das/v2/",
-            api_params: { dgs: data.dgs },
             url: `https://www.familysearch.org/en/records/images/search-results?imageGroupNumbers=${data.dgs}`,
           },
         });
@@ -687,19 +681,16 @@ export async function POST(request: NextRequest) {
           // Upsert descriptionOnlineCopy
           await inspectorPrisma.descriptionOnlineCopy.upsert({
             where: {
-              resource_id_description_id_api_params: {
+              resource_id_description_id_url: {
                 resource_id: FAMILY_SEARCH_RESOURCE_ID,
                 description_id: descriptionId,
-                api_params: { dgs: data.dgs },
+                url: `https://www.familysearch.org/en/records/images/search-results?imageGroupNumbers=${data.dgs}`,
               },
             },
             update: {},
             create: {
               resource_id: FAMILY_SEARCH_RESOURCE_ID,
               description_id: descriptionId,
-              api_url:
-                "https://sg30p0.familysearch.org/service/records/storage/dascloud/das/v2/",
-              api_params: { dgs: data.dgs },
               url: `https://www.familysearch.org/en/records/images/search-results?imageGroupNumbers=${data.dgs}`,
             },
           });
@@ -792,19 +783,16 @@ export async function POST(request: NextRequest) {
           // Upsert caseOnlineCopy
           await inspectorPrisma.caseOnlineCopy.upsert({
             where: {
-              resource_id_case_id_api_params: {
+              resource_id_case_id_url: {
                 resource_id: FAMILY_SEARCH_RESOURCE_ID,
                 case_id: caseItem.id,
-                api_params: { dgs: data.dgs },
+                url: `https://www.familysearch.org/en/records/images/search-results?imageGroupNumbers=${data.dgs}`,
               },
             },
             update: {},
             create: {
               resource_id: FAMILY_SEARCH_RESOURCE_ID,
               case_id: caseItem.id,
-              api_url:
-                "https://sg30p0.familysearch.org/service/records/storage/dascloud/das/v2/",
-              api_params: { dgs: data.dgs },
               url: `https://www.familysearch.org/en/records/images/search-results?imageGroupNumbers=${data.dgs}`,
             },
           });

@@ -1,5 +1,5 @@
 import ParentalStructureInput from "@/components/parental-structure-input";
-import { Archive, Author, Prisma } from "@generated/prisma/inspector-client";
+import { Archive, Author, Prisma } from "@generated/prisma/inspector/client/client";
 import { Input } from "@heroui/input";
 import { Key, useState } from "react";
 

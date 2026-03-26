@@ -7,7 +7,7 @@ import { useAdmin } from "@/hooks/useAdmin";
 import InspectorTable from "@/components/inspector-table";
 import InspectorPanel from "@/components/inspector-panel";
 import { diff } from "@/lib/algorithm";
-import { Archive, Author } from "@generated/prisma/inspector-client";
+import { Archive, Author } from "@generated/prisma/inspector/client/client";
 
 interface InspectorViewProps {
   archives: Archive[];
