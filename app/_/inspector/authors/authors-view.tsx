@@ -11,7 +11,7 @@ import {
   useDisclosure,
 } from "@heroui/modal";
 import InspectorView from "@/components/inspector-view";
-import { Archive, Author } from "@/generated/prisma/inspector-client";
+import { Archive, Author } from "@generated/prisma/inspector-client";
 import AuthorMergeForm from "@/app/_/inspector/authors/author-merge-form";
 import { ColDef } from "ag-grid-community";
 import { BaseInstance } from "@/types";

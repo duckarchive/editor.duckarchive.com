@@ -1,5 +1,5 @@
 import { autoParseFSItem } from "@/app/inspector/import-family-search/parsers";
-import { Prisma } from "@/generated/prisma/inspector-client";
+import { Prisma } from "@generated/prisma/inspector-client";
 import { buildWhereClause } from "@/lib/api";
 import { inspectorPrisma } from "@/lib/db";
 import { parseDate } from "@/lib/parse";

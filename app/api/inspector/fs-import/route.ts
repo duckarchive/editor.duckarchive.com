@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { inspectorPrisma } from "@/lib/db";
-import { Prisma } from "@/generated/prisma/inspector-client";
+import { Prisma } from "@generated/prisma/inspector-client";
 import { parseDate } from "@/lib/parse";
 
 export type FSItemsFreshResponse = Prisma.FamilySearchItemGetPayload<{

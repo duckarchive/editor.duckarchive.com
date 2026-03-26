@@ -1,33 +1,28 @@
-import duckarchive from "@/generated/prisma/duckarchive-client";
-import duckkey from "@/generated/prisma/duckkey-client";
-import inspector from "@/generated/prisma/inspector-client";
+import { PrismaClient as DuckarchiveClient } from "@generated/prisma/duckarchive/client/client";
+import { PrismaClient as DuckkeyClient } from "@generated/prisma/duckkey/client/client";
+import { PrismaClient as InspectorClient } from "@generated/prisma/inspector/client/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const duckarchiveClientSingleton = () =>
-  new duckarchive.PrismaClient({
-    datasources: {
-      db: {
-        url: process.env.DUCKARCHIVE_DATABASE_URL,
-      },
-    },
+const duckarchiveClientSingleton = () => {
+  const adapter = new PrismaPg({
+    connectionString: process.env.DUCKARCHIVE_DATABASE_URL,
   });
+  return new DuckarchiveClient({ adapter });
+};
 
-const duckkeyClientSingleton = () =>
-  new duckkey.PrismaClient({
-    datasources: {
-      db: {
-        url: process.env.DUCKKEY_DATABASE_URL,
-      },
-    },
+const duckkeyClientSingleton = () => {
+  const adapter = new PrismaPg({
+    connectionString: process.env.DUCKKEY_DATABASE_URL,
   });
+  return new DuckkeyClient({ adapter });
+};
 
-const inspectorClientSingleton = () =>
-  new inspector.PrismaClient({
-    datasources: {
-      db: {
-        url: process.env.INSPECTOR_DATABASE_URL,
-      },
-    },
+const inspectorClientSingleton = () => {
+  const adapter = new PrismaPg({
+    connectionString: process.env.INSPECTOR_DATABASE_URL,
   });
+  return new InspectorClient({ adapter });
+};
 
 declare const globalThis: {
   duckarchiveClientGlobal?: ReturnType<typeof duckarchiveClientSingleton>;

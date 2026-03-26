@@ -1,4 +1,4 @@
-import { Archive } from "@/generated/prisma/inspector-client";
+import { Archive } from "@generated/prisma/inspector-client";
 import { Autocomplete, AutocompleteItem } from "@heroui/autocomplete";
 import { Key } from "react";
 
