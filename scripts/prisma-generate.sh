@@ -10,6 +10,5 @@ names=(
 # run prisma generate for each schema
 for name in "${names[@]}"; do
   echo "Generating Prisma client for $name..."
-  PRISMA_CLIENT_OUTPUT="$(pwd)/generated/prisma/$name-client" \
-  prisma generate --schema "node_modules/@duckarchive/prisma/prisma/$name/schema.prisma"
+  prisma generate --config "../prisma-$name.config.ts"
 done

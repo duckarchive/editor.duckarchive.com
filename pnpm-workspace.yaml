@@ -1,7 +1,9 @@
 onlyBuiltDependencies:
-  - '@heroui/shared-utils'
-  - '@prisma/client'
-  - '@prisma/engines'
+  - "@duckarchive/framework"
+  - "@duckarchive/utils"
+  - "@heroui/shared-utils"
+  - "@prisma/client"
+  - "@prisma/engines"
   - prisma
   - sharp
   - unrs-resolver
