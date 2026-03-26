@@ -90,62 +90,51 @@ interface CTree {
 }
 
 const processByQueryParams = async (qp: URLSearchParams) => {
-  // const where = buildWhereClause(qp);
+  const where = buildWhereClause(qp);
 
-  // const dbItems = await inspectorPrisma.familySearchItem.findMany({
-  //   where: {
-  //     ...where,
-  //     OR: [
-  //       {
-  //         updated_at: {
-  //           gt: inspectorPrisma.familySearchItem.fields.cataloged_at,
-  //         },
-  //       },
-  //       {
-  //         cataloged_at: null,
-  //       },
-  //     ],
-  //   },
-  //   take: 500,
-  //   orderBy: { updated_at: "desc" },
-  //   include: {
-  //     project: {
-  //       include: {
-  //         archive: true,
-  //       },
-  //     },
-  //   },
-  // });
-
-  const _dbItems = await inspectorPrisma.$queryRaw<any[]>`
-    SELECT
-      fsi.*,
-      fsp.archive_id AS project_archive_id,
-      a.code AS project_archive_code
-    FROM "family_search_items" fsi
-    LEFT JOIN "family_search_projects" fsp
-      ON fsi.project_id = fsp.id
-    LEFT JOIN "archives" a
-      ON fsp.archive_id = a.id
-    WHERE (
-      fsi.updated_at > fsi.cataloged_at
-      OR fsi.cataloged_at IS NULL
-    )
-      AND fsi.volumes ~ '^Р-9106-\\d+-к'
-    ORDER BY fsi.updated_at DESC
-    LIMIT 5000
-  `;
-
-  const dbItems = _dbItems.map(
-    ({ project_archive_id, project_archive_code, ...item }) =>
-      ({
-        ...item,
-        project: {
-          archive_id: project_archive_id,
-          archive: { code: project_archive_code },
+  const dbItems = await inspectorPrisma.familySearchItem.findMany({
+    where: {
+      ...where,
+      OR: [
+        {
+          updated_at: {
+            gt: inspectorPrisma.familySearchItem.fields.cataloged_at,
+          },
         },
-      }) as ImportItem
-  );
+        {
+          cataloged_at: null,
+        },
+      ],
+    },
+    take: 5000,
+    orderBy: { updated_at: "desc" },
+    include: {
+      project: {
+        include: {
+          archive: true,
+        },
+      },
+    },
+  });
+
+  // const dbItems = await inspectorPrisma.$queryRaw<any[]>`
+  //   SELECT
+  //     fsi.*,
+  //     fsp.archive_id AS project_archive_id,
+  //     a.code AS project_archive_code
+  //   FROM "family_search_items" fsi
+  //   LEFT JOIN "family_search_projects" fsp
+  //     ON fsi.project_id = fsp.id
+  //   LEFT JOIN "archives" a
+  //     ON fsp.archive_id = a.id
+  //   WHERE (
+  //     fsi.updated_at > fsi.cataloged_at
+  //     OR fsi.cataloged_at IS NULL
+  //   )
+  //     AND fsi.volumes ~ '^Р-9106-\\d+-к'
+  //   ORDER BY fsi.updated_at DESC
+  //   LIMIT 5000
+  // `;
 
   const items: ImportItem[] = dbItems.map(
     (item) =>
