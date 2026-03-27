@@ -139,8 +139,9 @@ const ImportFamilySearch: React.FC<InspectorViewProps> = ({
             onPress={handleFullImport}
             isLoading={isFullImporting}
             color="warning"
+            isDisabled={!queryString.length}
           >
-            Зберегти всі записи
+            Зберегти всі записи з поточними фільтрами
           </Button>
         </div>
       </div>
