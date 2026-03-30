@@ -1,5 +1,7 @@
 import { FSItemsFreshResponse } from "@/app/api/inspector/fs-import/route";
 import classicParser from "@/app/inspector/import-family-search/parsers/classic.parser";
+import descriptionWithLetter from "@/app/inspector/import-family-search/parsers/description-with-letter.parser";
+import descriptionWithVolumeParser from "@/app/inspector/import-family-search/parsers/description-with-volume.parser";
 import museumParser from "@/app/inspector/import-family-search/parsers/museum.parser";
 import shortWithLatinPrefixParser from "@/app/inspector/import-family-search/parsers/short-with-latin-prefix.parser";
 import shortParser from "@/app/inspector/import-family-search/parsers/short.parser";
@@ -42,13 +44,6 @@ const latin2cyrillic = (str: string): string => {
     .map((char) => (charMap[char.toLowerCase()] || char).toUpperCase())
     .join("");
 };
-
-interface MetaItem {
-  raw: string;
-  fund: string;
-  description: string;
-  casesRange: [string, string?];
-}
 
 const del = "[., ]+";
 const sub = "[абвдоп. ]{0,5}";
@@ -96,6 +91,8 @@ const templates: {
 
 const parsers: Parser[] = [
   // tempParser,
+  descriptionWithVolumeParser,
+  descriptionWithLetter,
   volumeParser,
   shortParser,
   shortWithLatinPrefixParser,
