@@ -10,13 +10,13 @@ importers:
     dependencies:
       '@duckarchive/framework':
         specifier: github:duckarchive/framework
-        version: https://codeload.github.com/duckarchive/framework/tar.gz/9c4086398aa887418b4cbb8420609b845994ae64(7f22388a030541e54b2bd48d0d464a12)
+        version: https://codeload.github.com/duckarchive/framework/tar.gz/f24cee48ed81d8e80d055426b12c8ad6210d06ae(7f22388a030541e54b2bd48d0d464a12)
       '@duckarchive/map':
         specifier: github:duckarchive/map
-        version: https://codeload.github.com/duckarchive/map/tar.gz/469f260e5822263fbca98d00c737f77f784a438e(1c4ddbb75d0307c6a6ce565a44abf6a0)
+        version: https://codeload.github.com/duckarchive/map/tar.gz/e1aeea97f2e972b1407a3b2d9f57d54c796ca306(1c4ddbb75d0307c6a6ce565a44abf6a0)
       '@duckarchive/prisma':
         specifier: github:duckarchive/prisma
-        version: https://codeload.github.com/duckarchive/prisma/tar.gz/a008869cf57e0ee892a99ad7e80c454de8b3edfb(@prisma/adapter-pg@7.5.0)(@prisma/client@7.5.0(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3))(prisma-zod-generator@2.1.4(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3)(zod@4.0.17))
+        version: https://codeload.github.com/duckarchive/prisma/tar.gz/6074900bca3dce43306b337c4277213c27cc938d(@prisma/adapter-pg@7.5.0)(@prisma/client@7.5.0(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3))(prisma-zod-generator@2.1.4(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3)(zod@4.0.17))
       '@duckarchive/utils':
         specifier: github:duckarchive/utils
         version: https://codeload.github.com/duckarchive/utils/tar.gz/93e7fafe61a3289f142eae5dbd3beb6edafdc842
@@ -270,9 +270,9 @@ packages:
   '@chevrotain/utils@10.5.0':
     resolution: {integrity: sha512-hBzuU5+JjB2cqNZyszkDHZgOSrUUT8V3dhgRl8Q9Gp6dAj/H5+KILGjbhDpc3Iy9qmqlm/akuOI2ut9VUtzJxQ==}
 
-  '@duckarchive/framework@https://codeload.github.com/duckarchive/framework/tar.gz/9c4086398aa887418b4cbb8420609b845994ae64':
-    resolution: {tarball: https://codeload.github.com/duckarchive/framework/tar.gz/9c4086398aa887418b4cbb8420609b845994ae64}
-    version: 1.0.0
+  '@duckarchive/framework@https://codeload.github.com/duckarchive/framework/tar.gz/f24cee48ed81d8e80d055426b12c8ad6210d06ae':
+    resolution: {tarball: https://codeload.github.com/duckarchive/framework/tar.gz/f24cee48ed81d8e80d055426b12c8ad6210d06ae}
+    version: 1.0.1
     peerDependencies:
       '@heroui/avatar': ^2.2.25
       '@heroui/button': ^2.2.21
@@ -298,9 +298,9 @@ packages:
       react: ^19.1.0
       react-icons: ^5.5.0
 
-  '@duckarchive/map@https://codeload.github.com/duckarchive/map/tar.gz/469f260e5822263fbca98d00c737f77f784a438e':
-    resolution: {tarball: https://codeload.github.com/duckarchive/map/tar.gz/469f260e5822263fbca98d00c737f77f784a438e}
-    version: 1.3.1
+  '@duckarchive/map@https://codeload.github.com/duckarchive/map/tar.gz/e1aeea97f2e972b1407a3b2d9f57d54c796ca306':
+    resolution: {tarball: https://codeload.github.com/duckarchive/map/tar.gz/e1aeea97f2e972b1407a3b2d9f57d54c796ca306}
+    version: 1.4.0
     peerDependencies:
       '@heroui/autocomplete': '*'
       '@heroui/button': '*'
@@ -335,9 +335,9 @@ packages:
       tailwindcss:
         optional: true
 
-  '@duckarchive/prisma@https://codeload.github.com/duckarchive/prisma/tar.gz/a008869cf57e0ee892a99ad7e80c454de8b3edfb':
-    resolution: {tarball: https://codeload.github.com/duckarchive/prisma/tar.gz/a008869cf57e0ee892a99ad7e80c454de8b3edfb}
-    version: 3.4.0
+  '@duckarchive/prisma@https://codeload.github.com/duckarchive/prisma/tar.gz/6074900bca3dce43306b337c4277213c27cc938d':
+    resolution: {tarball: https://codeload.github.com/duckarchive/prisma/tar.gz/6074900bca3dce43306b337c4277213c27cc938d}
+    version: 4.0.0
     peerDependencies:
       '@prisma/adapter-pg': ^7.2.0
       '@prisma/client': ^7.2.0
@@ -2143,8 +2143,8 @@ packages:
   '@swc/helpers@0.5.17':
     resolution: {integrity: sha512-5IKx/Y13RsYd+sauPb2x+U/xZikHjolzfuDgTAl/Tdf3Q8rslRvC19NKDLgAJQ6wsqADk10ntlv08nPFw/gO/A==}
 
-  '@swc/helpers@0.5.20':
-    resolution: {integrity: sha512-2egEBHUMasdypIzrprsu8g+OEVd7Vp2MM3a2eVlM/cyFYto0nGz5BX5BTgh/ShZZI9ed+ozEq+Ngt+rgmUs8tw==}
+  '@swc/helpers@0.5.21':
+    resolution: {integrity: sha512-jI/VAmtdjB/RnI8GTnokyX7Ug8c+g+ffD6QRLa6XQewtnGyukKkKSk3wLTM3b5cjt1jNh9x0jfVlagdN2gDKQg==}
 
   '@tanstack/react-virtual@3.11.3':
     resolution: {integrity: sha512-vCU+OTylXN3hdC8RKg68tPlBPjjxtzon7Ys46MgrSLE+JhSjSTPvoQifV6DQJeJmA8Q3KT6CphJbejupx85vFw==}
@@ -4574,7 +4574,7 @@ snapshots:
 
   '@chevrotain/utils@10.5.0': {}
 
-  '@duckarchive/framework@https://codeload.github.com/duckarchive/framework/tar.gz/9c4086398aa887418b4cbb8420609b845994ae64(7f22388a030541e54b2bd48d0d464a12)':
+  '@duckarchive/framework@https://codeload.github.com/duckarchive/framework/tar.gz/f24cee48ed81d8e80d055426b12c8ad6210d06ae(7f22388a030541e54b2bd48d0d464a12)':
     dependencies:
       '@heroui/avatar': 2.2.26(@heroui/system@2.4.20(@heroui/theme@2.4.17(tailwindcss@3.4.16))(framer-motion@11.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@heroui/theme@2.4.17(tailwindcss@3.4.16))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@heroui/button': 2.2.21(@heroui/system@2.4.20(@heroui/theme@2.4.17(tailwindcss@3.4.16))(framer-motion@11.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@heroui/theme@2.4.17(tailwindcss@3.4.16))(framer-motion@11.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -4601,7 +4601,7 @@ snapshots:
       react: 18.3.1
       react-icons: 5.5.0(react@18.3.1)
 
-  '@duckarchive/map@https://codeload.github.com/duckarchive/map/tar.gz/469f260e5822263fbca98d00c737f77f784a438e(1c4ddbb75d0307c6a6ce565a44abf6a0)':
+  '@duckarchive/map@https://codeload.github.com/duckarchive/map/tar.gz/e1aeea97f2e972b1407a3b2d9f57d54c796ca306(1c4ddbb75d0307c6a6ce565a44abf6a0)':
     dependencies:
       leaflet: 1.9.4
       leaflet-geosearch: 4.2.0
@@ -4619,7 +4619,7 @@ snapshots:
       swr: 2.3.6(react@18.3.1)
       tailwindcss: 3.4.16
 
-  '@duckarchive/prisma@https://codeload.github.com/duckarchive/prisma/tar.gz/a008869cf57e0ee892a99ad7e80c454de8b3edfb(@prisma/adapter-pg@7.5.0)(@prisma/client@7.5.0(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3))(prisma-zod-generator@2.1.4(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3)(zod@4.0.17))':
+  '@duckarchive/prisma@https://codeload.github.com/duckarchive/prisma/tar.gz/6074900bca3dce43306b337c4277213c27cc938d(@prisma/adapter-pg@7.5.0)(@prisma/client@7.5.0(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3))(prisma-zod-generator@2.1.4(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3)(zod@4.0.17))':
     dependencies:
       '@prisma/adapter-pg': 7.5.0
       '@prisma/client': 7.5.0(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3)
@@ -5930,7 +5930,7 @@ snapshots:
 
   '@internationalized/date@3.12.0':
     dependencies:
-      '@swc/helpers': 0.5.20
+      '@swc/helpers': 0.5.21
 
   '@internationalized/date@3.8.2':
     dependencies:
@@ -6234,7 +6234,7 @@ snapshots:
       '@react-aria/utils': 3.33.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-types/dialog': 3.5.24(react@18.3.1)
       '@react-types/shared': 3.33.1(react@18.3.1)
-      '@swc/helpers': 0.5.20
+      '@swc/helpers': 0.5.21
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
@@ -6273,7 +6273,7 @@ snapshots:
       '@react-aria/interactions': 3.27.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-aria/utils': 3.33.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-types/shared': 3.33.1(react@18.3.1)
-      '@swc/helpers': 0.5.20
+      '@swc/helpers': 0.5.21
       clsx: 2.1.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -6346,7 +6346,7 @@ snapshots:
       '@react-aria/ssr': 3.9.10(react@18.3.1)
       '@react-aria/utils': 3.33.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-types/shared': 3.33.1(react@18.3.1)
-      '@swc/helpers': 0.5.20
+      '@swc/helpers': 0.5.21
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
@@ -6386,7 +6386,7 @@ snapshots:
       '@react-aria/utils': 3.33.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-stately/flags': 3.1.2
       '@react-types/shared': 3.33.1(react@18.3.1)
-      '@swc/helpers': 0.5.20
+      '@swc/helpers': 0.5.21
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
@@ -6472,7 +6472,7 @@ snapshots:
       '@react-types/button': 3.15.1(react@18.3.1)
       '@react-types/menu': 3.10.7(react@18.3.1)
       '@react-types/shared': 3.33.1(react@18.3.1)
-      '@swc/helpers': 0.5.20
+      '@swc/helpers': 0.5.21
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
@@ -6553,7 +6553,7 @@ snapshots:
       '@react-types/button': 3.15.1(react@18.3.1)
       '@react-types/overlays': 3.9.4(react@18.3.1)
       '@react-types/shared': 3.33.1(react@18.3.1)
-      '@swc/helpers': 0.5.20
+      '@swc/helpers': 0.5.21
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
@@ -6589,7 +6589,7 @@ snapshots:
       '@react-aria/utils': 3.33.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-stately/selection': 3.20.9(react@18.3.1)
       '@react-types/shared': 3.33.1(react@18.3.1)
-      '@swc/helpers': 0.5.20
+      '@swc/helpers': 0.5.21
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
@@ -6757,7 +6757,7 @@ snapshots:
       '@react-stately/flags': 3.1.2
       '@react-stately/utils': 3.11.0(react@18.3.1)
       '@react-types/shared': 3.33.1(react@18.3.1)
-      '@swc/helpers': 0.5.20
+      '@swc/helpers': 0.5.21
       clsx: 2.1.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
@@ -6794,7 +6794,7 @@ snapshots:
       '@react-aria/interactions': 3.27.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-aria/utils': 3.33.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-types/shared': 3.33.1(react@18.3.1)
-      '@swc/helpers': 0.5.20
+      '@swc/helpers': 0.5.21
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
@@ -6807,7 +6807,7 @@ snapshots:
   '@react-stately/collections@3.12.10(react@18.3.1)':
     dependencies:
       '@react-types/shared': 3.33.1(react@18.3.1)
-      '@swc/helpers': 0.5.20
+      '@swc/helpers': 0.5.21
       react: 18.3.1
 
   '@react-stately/collections@3.12.5(react@18.3.1)':
@@ -6880,7 +6880,7 @@ snapshots:
       '@react-stately/overlays': 3.6.23(react@18.3.1)
       '@react-types/menu': 3.10.7(react@18.3.1)
       '@react-types/shared': 3.33.1(react@18.3.1)
-      '@swc/helpers': 0.5.20
+      '@swc/helpers': 0.5.21
       react: 18.3.1
 
   '@react-stately/menu@3.9.6(react@18.3.1)':
@@ -6918,7 +6918,7 @@ snapshots:
     dependencies:
       '@react-stately/utils': 3.11.0(react@18.3.1)
       '@react-types/overlays': 3.9.4(react@18.3.1)
-      '@swc/helpers': 0.5.20
+      '@swc/helpers': 0.5.21
       react: 18.3.1
 
   '@react-stately/select@3.7.0(react@18.3.1)':
@@ -6952,7 +6952,7 @@ snapshots:
       '@react-stately/collections': 3.12.10(react@18.3.1)
       '@react-stately/utils': 3.11.0(react@18.3.1)
       '@react-types/shared': 3.33.1(react@18.3.1)
-      '@swc/helpers': 0.5.20
+      '@swc/helpers': 0.5.21
       react: 18.3.1
 
   '@react-stately/slider@3.7.0(react@18.3.1)':
@@ -7025,7 +7025,7 @@ snapshots:
       '@react-stately/selection': 3.20.9(react@18.3.1)
       '@react-stately/utils': 3.11.0(react@18.3.1)
       '@react-types/shared': 3.33.1(react@18.3.1)
-      '@swc/helpers': 0.5.20
+      '@swc/helpers': 0.5.21
       react: 18.3.1
 
   '@react-stately/utils@3.10.7(react@18.3.1)':
@@ -7040,7 +7040,7 @@ snapshots:
 
   '@react-stately/utils@3.11.0(react@18.3.1)':
     dependencies:
-      '@swc/helpers': 0.5.20
+      '@swc/helpers': 0.5.21
       react: 18.3.1
 
   '@react-types/accordion@3.0.0-alpha.26(react@18.3.1)':
@@ -7227,7 +7227,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@swc/helpers@0.5.20':
+  '@swc/helpers@0.5.21':
     dependencies:
       tslib: 2.8.1
 
