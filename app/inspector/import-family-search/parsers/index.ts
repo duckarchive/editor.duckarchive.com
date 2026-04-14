@@ -114,6 +114,6 @@ export const autoParseFSItem = (
   return parser
     .parse(item)
     .map((parts) =>
-      [a, ...parts.map((part) => parseCode(part, true))].join("-")
+      [a, ...parts.map((part) => parseCode(part, true, true))].join("-")
     );
 };

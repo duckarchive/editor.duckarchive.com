@@ -7,6 +7,10 @@ const routes = [
     path: "import-family-search",
     label: "Імпорт Family Search",
   },
+  {
+    path: "import-csv",
+    label: "Імпорт CSV",
+  },
 ];
 
 const DuckInspectorPage: NextPage = async () => {

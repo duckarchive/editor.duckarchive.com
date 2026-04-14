@@ -140,7 +140,7 @@ export const autoParseFSItem = (item?: FSItemsFreshResponse[number]): string[] =
   if (!item) return [];
   const a = item.project.archive?.code || "";
 
-  const [_, f, d, c] = (regexps.find((r) => r.test(item.volumes || ""))?.exec(item.volumes || "") || []).map(raw => parseCode(raw));
+  const [_, f, d, c] = (regexps.find((r) => r.test(item.volumes || ""))?.exec(item.volumes || "") || []).map(raw => parseCode(raw, true, true));
 
   return [[a, f, d, c].join("-")];
 };

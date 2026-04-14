@@ -19,7 +19,7 @@ importers:
         version: https://codeload.github.com/duckarchive/prisma/tar.gz/6074900bca3dce43306b337c4277213c27cc938d(@prisma/adapter-pg@7.5.0)(@prisma/client@7.5.0(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3))(prisma-zod-generator@2.1.4(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3)(zod@4.0.17))
       '@duckarchive/utils':
         specifier: github:duckarchive/utils
-        version: https://codeload.github.com/duckarchive/utils/tar.gz/93e7fafe61a3289f142eae5dbd3beb6edafdc842
+        version: https://codeload.github.com/duckarchive/utils/tar.gz/b50187fd617071d875bc57ee1041432b8fc8f14c
       '@heroui/accordion':
         specifier: ^2.2.23
         version: 2.2.23(@heroui/system@2.4.20(@heroui/theme@2.4.17(tailwindcss@3.4.16))(framer-motion@11.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@heroui/theme@2.4.17(tailwindcss@3.4.16))(framer-motion@11.13.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -125,6 +125,9 @@ importers:
       next-themes:
         specifier: 0.4.6
         version: 0.4.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      papaparse:
+        specifier: ^5.5.3
+        version: 5.5.3
       pg:
         specifier: ^8.20.0
         version: 8.20.0
@@ -174,6 +177,9 @@ importers:
       '@types/node':
         specifier: 22.15.3
         version: 22.15.3
+      '@types/papaparse':
+        specifier: ^5.5.2
+        version: 5.5.2
       '@types/qs':
         specifier: ^6.14.0
         version: 6.14.0
@@ -343,9 +349,9 @@ packages:
       '@prisma/client': ^7.2.0
       prisma-zod-generator: ^2.1.2
 
-  '@duckarchive/utils@https://codeload.github.com/duckarchive/utils/tar.gz/93e7fafe61a3289f142eae5dbd3beb6edafdc842':
-    resolution: {tarball: https://codeload.github.com/duckarchive/utils/tar.gz/93e7fafe61a3289f142eae5dbd3beb6edafdc842}
-    version: 1.1.0
+  '@duckarchive/utils@https://codeload.github.com/duckarchive/utils/tar.gz/b50187fd617071d875bc57ee1041432b8fc8f14c':
+    resolution: {tarball: https://codeload.github.com/duckarchive/utils/tar.gz/b50187fd617071d875bc57ee1041432b8fc8f14c}
+    version: 1.2.0
 
   '@electric-sql/pglite-socket@0.0.20':
     resolution: {integrity: sha512-J5nLGsicnD9wJHnno9r+DGxfcZWh+YJMCe0q/aCgtG6XOm9Z7fKeite8IZSNXgZeGltSigM9U/vAWZQWdgcSFg==}
@@ -2197,6 +2203,9 @@ packages:
   '@types/node@22.15.3':
     resolution: {integrity: sha512-lX7HFZeHf4QG/J7tBZqrCAXwz9J5RD56Y6MpP0eJkka8p+K0RY/yBTW7CYFJ4VGCclxqOLKmiGP5juQc6MKgcw==}
 
+  '@types/papaparse@5.5.2':
+    resolution: {integrity: sha512-gFnFp/JMzLHCwRf7tQHrNnfhN4eYBVYYI897CGX4MY1tzY9l2aLkVyx2IlKZ/SAqDbB3I1AOZW5gTMGGsqWliA==}
+
   '@types/pg@8.11.11':
     resolution: {integrity: sha512-kGT1qKM8wJQ5qlawUrEkXgvMSXoV213KfMGXcwfDwUIfUHXqXYXOfS1nE1LINRJVVVx5wCm70XnFlMHaIcQAfw==}
 
@@ -3752,6 +3761,9 @@ packages:
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
 
+  papaparse@5.5.3:
+    resolution: {integrity: sha512-5QvjGxYVjxO59MGU2lHVYpRWBBtKHnlIAcSe1uNFCkkptUh63NFRj0FJQm7nR67puEruUci/ZkjmEFrjCAyP4A==}
+
   parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
     engines: {node: '>=6'}
@@ -4625,7 +4637,7 @@ snapshots:
       '@prisma/client': 7.5.0(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3)
       prisma-zod-generator: 2.1.4(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3)(zod@4.0.17)
 
-  '@duckarchive/utils@https://codeload.github.com/duckarchive/utils/tar.gz/93e7fafe61a3289f142eae5dbd3beb6edafdc842':
+  '@duckarchive/utils@https://codeload.github.com/duckarchive/utils/tar.gz/b50187fd617071d875bc57ee1041432b8fc8f14c':
     dependencies:
       lodash: 4.17.21
 
@@ -7290,6 +7302,10 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/papaparse@5.5.2':
+    dependencies:
+      '@types/node': 22.15.3
+
   '@types/pg@8.11.11':
     dependencies:
       '@types/node': 22.15.3
@@ -9006,6 +9022,8 @@ snapshots:
       p-limit: 3.1.0
 
   package-json-from-dist@1.0.1: {}
+
+  papaparse@5.5.3: {}
 
   parent-module@1.0.1:
     dependencies:
