@@ -16,7 +16,7 @@ importers:
         version: https://codeload.github.com/duckarchive/map/tar.gz/e1aeea97f2e972b1407a3b2d9f57d54c796ca306(1c4ddbb75d0307c6a6ce565a44abf6a0)
       '@duckarchive/prisma':
         specifier: github:duckarchive/prisma
-        version: https://codeload.github.com/duckarchive/prisma/tar.gz/6074900bca3dce43306b337c4277213c27cc938d(@prisma/adapter-pg@7.5.0)(@prisma/client@7.5.0(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3))(prisma-zod-generator@2.1.4(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3)(zod@4.0.17))
+        version: https://codeload.github.com/duckarchive/prisma/tar.gz/051211ef16effecba4a53b9bf99221df6b388fd5(@prisma/adapter-pg@7.5.0)(@prisma/client@7.5.0(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3))(prisma-zod-generator@2.1.4(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3)(zod@4.0.17))
       '@duckarchive/utils':
         specifier: github:duckarchive/utils
         version: https://codeload.github.com/duckarchive/utils/tar.gz/b50187fd617071d875bc57ee1041432b8fc8f14c
@@ -341,9 +341,9 @@ packages:
       tailwindcss:
         optional: true
 
-  '@duckarchive/prisma@https://codeload.github.com/duckarchive/prisma/tar.gz/6074900bca3dce43306b337c4277213c27cc938d':
-    resolution: {tarball: https://codeload.github.com/duckarchive/prisma/tar.gz/6074900bca3dce43306b337c4277213c27cc938d}
-    version: 4.0.0
+  '@duckarchive/prisma@https://codeload.github.com/duckarchive/prisma/tar.gz/051211ef16effecba4a53b9bf99221df6b388fd5':
+    resolution: {tarball: https://codeload.github.com/duckarchive/prisma/tar.gz/051211ef16effecba4a53b9bf99221df6b388fd5}
+    version: 4.0.1
     peerDependencies:
       '@prisma/adapter-pg': ^7.2.0
       '@prisma/client': ^7.2.0
@@ -4631,7 +4631,7 @@ snapshots:
       swr: 2.3.6(react@18.3.1)
       tailwindcss: 3.4.16
 
-  '@duckarchive/prisma@https://codeload.github.com/duckarchive/prisma/tar.gz/6074900bca3dce43306b337c4277213c27cc938d(@prisma/adapter-pg@7.5.0)(@prisma/client@7.5.0(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3))(prisma-zod-generator@2.1.4(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3)(zod@4.0.17))':
+  '@duckarchive/prisma@https://codeload.github.com/duckarchive/prisma/tar.gz/051211ef16effecba4a53b9bf99221df6b388fd5(@prisma/adapter-pg@7.5.0)(@prisma/client@7.5.0(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3))(prisma-zod-generator@2.1.4(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3)(zod@4.0.17))':
     dependencies:
       '@prisma/adapter-pg': 7.5.0
       '@prisma/client': 7.5.0(prisma@7.5.0(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.6.3))(typescript@5.6.3)

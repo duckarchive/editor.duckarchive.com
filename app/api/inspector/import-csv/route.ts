@@ -7,7 +7,6 @@ import type {
   ImportResult,
   ColumnMapping,
   CodeOverrides,
-  ConflictConfig,
   TargetLevel,
 } from "@/app/inspector/import-csv/lib/types";
 
@@ -114,25 +113,14 @@ function buildTree(
 }
 
 function getYearRanges(node: TreeNode): { start_year: number; end_year: number }[] {
-  // 1. Single raw "years" column
-  if (node.years) {
-    return parseYears(node.years);
-  }
-  // 2. Separate start_year + end_year columns
+  if (node.years) return parseYears(node.years);
   if (node.start_year && node.end_year) {
     const start = parseInt(node.start_year, 10);
     const end = parseInt(node.end_year, 10);
-    if (!isNaN(start) && !isNaN(end)) {
-      return [{ start_year: start, end_year: end }];
-    }
+    if (!isNaN(start) && !isNaN(end)) return [{ start_year: start, end_year: end }];
   }
-  // 3. Only one of the two — try parseYears on it
-  if (node.start_year) {
-    return parseYears(node.start_year);
-  }
-  if (node.end_year) {
-    return parseYears(node.end_year);
-  }
+  if (node.start_year) return parseYears(node.start_year);
+  if (node.end_year) return parseYears(node.end_year);
   return [];
 }
 
@@ -157,36 +145,30 @@ export async function POST(request: NextRequest) {
     const l2Ids = new Map<string, string>();
 
     // Step 1: Upsert level-1 entities (funds/fonds)
-    console.time("CSV Import: Step 1 - Level 1 entities");
+    console.time("CSV Import: Step 1");
     const l1Entries = Object.entries(tree);
-    const l1Chunks = chunk(l1Entries, 10);
-
-    for (const l1Chunk of l1Chunks) {
+    for (const l1Chunk of chunk(l1Entries, 50)) {
       await Promise.all(
         l1Chunk.map(async ([l1Code, node]) => {
           try {
             const title = node.title ? parseTitle(node.title) : undefined;
             const info = node.info ? parseTitle(node.info) : undefined;
-
             const updateData =
               conflictConfig.level1 === "overwrite"
                 ? { ...(title !== undefined && { title }), ...(info !== undefined && { info }) }
                 : {};
 
-            let entity;
-            if (isFDC) {
-              entity = await inspectorPrisma.fund.upsert({
-                where: { code_archive_id: { code: l1Code, archive_id: archive.id } },
-                update: updateData,
-                create: { code: l1Code, archive_id: archive.id, title, info },
-              });
-            } else {
-              entity = await inspectorPrisma.fond.upsert({
-                where: { code_archive_id: { code: l1Code, archive_id: archive.id } },
-                update: updateData,
-                create: { code: l1Code, archive_id: archive.id, title, info },
-              });
-            }
+            const entity = isFDC
+              ? await inspectorPrisma.fund.upsert({
+                  where: { code_archive_id: { code: l1Code, archive_id: archive.id } },
+                  update: updateData,
+                  create: { code: l1Code, archive_id: archive.id, title, info },
+                })
+              : await inspectorPrisma.fond.upsert({
+                  where: { code_archive_id: { code: l1Code, archive_id: archive.id } },
+                  update: updateData,
+                  create: { code: l1Code, archive_id: archive.id, title, info },
+                });
             l1Ids.set(l1Code, entity.id);
           } catch (err: any) {
             errors.push({ row: 0, message: `Фонд "${l1Code}": ${err.message}` });
@@ -194,12 +176,11 @@ export async function POST(request: NextRequest) {
         })
       );
     }
-    console.timeEnd("CSV Import: Step 1 - Level 1 entities");
+    console.timeEnd("CSV Import: Step 1");
 
     // Step 2: Upsert level-2 entities (descriptions/inventories)
-    console.time("CSV Import: Step 2 - Level 2 entities");
+    console.time("CSV Import: Step 2");
     const l2Entries: Array<{ l1Code: string; l2Code: string; node: TreeNode; l1Id: string }> = [];
-
     for (const [l1Code, l1Node] of Object.entries(tree)) {
       const l1Id = l1Ids.get(l1Code);
       if (!l1Id) continue;
@@ -208,56 +189,83 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const l2Chunks = chunk(l2Entries, 10);
-    for (const l2Chunk of l2Chunks) {
+    for (const l2Chunk of chunk(l2Entries, 50)) {
       await Promise.all(
         l2Chunk.map(async ({ l1Code, l2Code, node, l1Id }) => {
           try {
             const title = node.title ? parseTitle(node.title) : undefined;
             const info = node.info ? parseTitle(node.info) : undefined;
-
             const updateData =
               conflictConfig.level2 === "overwrite"
                 ? { ...(title !== undefined && { title }), ...(info !== undefined && { info }) }
                 : {};
 
             let entityId: string;
-            let hasYears: boolean;
+            let isNew: boolean;
 
             if (isFDC) {
-              const entity = await inspectorPrisma.description.upsert({
+              // Check existence first to know if it's new
+              const existing = await inspectorPrisma.description.findUnique({
                 where: { code_fund_id: { code: l2Code, fund_id: l1Id } },
-                update: updateData,
-                create: { code: l2Code, fund_id: l1Id, title, info },
-                include: { years: true },
+                select: { id: true },
               });
-              entityId = entity.id;
-              hasYears = entity.years.length > 0;
+              if (existing) {
+                entityId = existing.id;
+                isNew = false;
+                if (conflictConfig.level2 === "overwrite" && Object.keys(updateData).length > 0) {
+                  await inspectorPrisma.description.update({
+                    where: { id: existing.id },
+                    data: updateData,
+                  });
+                }
+              } else {
+                const created = await inspectorPrisma.description.create({
+                  data: { code: l2Code, fund_id: l1Id, title, info },
+                });
+                entityId = created.id;
+                isNew = true;
+              }
             } else {
-              const entity = await inspectorPrisma.inventory.upsert({
+              const existing = await inspectorPrisma.inventory.findUnique({
                 where: { code_fond_id: { code: l2Code, fond_id: l1Id } },
-                update: updateData,
-                create: { code: l2Code, fond_id: l1Id, title, info },
-                include: { years: true },
+                select: { id: true },
               });
-              entityId = entity.id;
-              hasYears = entity.years.length > 0;
+              if (existing) {
+                entityId = existing.id;
+                isNew = false;
+                if (conflictConfig.level2 === "overwrite" && Object.keys(updateData).length > 0) {
+                  await inspectorPrisma.inventory.update({
+                    where: { id: existing.id },
+                    data: updateData,
+                  });
+                }
+              } else {
+                const created = await inspectorPrisma.inventory.create({
+                  data: { code: l2Code, fond_id: l1Id, title, info },
+                });
+                entityId = created.id;
+                isNew = true;
+              }
             }
 
             l2Ids.set(`${l1Code}|${l2Code}`, entityId);
 
-            // Add years if entity is new (no existing years)
-            if (!hasYears) {
+            // Add years only for newly created entities
+            if (isNew) {
               const yearRanges = getYearRanges(node);
               for (const { start_year, end_year } of yearRanges) {
-                if (isFDC) {
-                  await inspectorPrisma.descriptionYear.create({
-                    data: { description_id: entityId, start_year, end_year },
-                  });
-                } else {
-                  await inspectorPrisma.inventoryYear.create({
-                    data: { inventory_id: entityId, start_year, end_year },
-                  });
+                try {
+                  if (isFDC) {
+                    await inspectorPrisma.descriptionYear.create({
+                      data: { description_id: entityId, start_year, end_year },
+                    });
+                  } else {
+                    await inspectorPrisma.inventoryYear.create({
+                      data: { inventory_id: entityId, start_year, end_year },
+                    });
+                  }
+                } catch {
+                  // Ignore duplicate year entries
                 }
               }
             }
@@ -269,11 +277,11 @@ export async function POST(request: NextRequest) {
         })
       );
     }
-    console.timeEnd("CSV Import: Step 2 - Level 2 entities");
+    console.timeEnd("CSV Import: Step 2");
 
-    // Step 3: Upsert level-3 entities (cases/files) if target level includes them
+    // Step 3: Upsert level-3 entities (cases/files)
     if (targetLevel === "level3") {
-      console.time("CSV Import: Step 3 - Level 3 entities");
+      console.time("CSV Import: Step 3");
       const l3Entries: Array<{
         l1Code: string;
         l2Code: string;
@@ -292,79 +300,106 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      const l3Chunks = chunk(l3Entries, 10);
-      for (const l3Chunk of l3Chunks) {
+      console.log(`CSV Import: Step 3 - processing ${l3Entries.length} entities`);
+
+      for (const l3Chunk of chunk(l3Entries, 50)) {
         await Promise.all(
           l3Chunk.map(async ({ l1Code, l2Code, l3Code, node, l2Id }) => {
             try {
               const title = node.title ? parseTitle(node.title) : undefined;
               const info = node.info ? parseTitle(node.info) : undefined;
               const fullCode = node.full_code || [archive.code, l1Code, l2Code, l3Code].join("-");
-
-              // Handle tags: convert comma-separated string to array
               const tagsArray = node.tags
                 ? node.tags.split(",").map((t: string) => t.trim()).filter(Boolean)
                 : undefined;
 
-              const updateData: Record<string, any> =
-                conflictConfig.level3 === "overwrite"
-                  ? {
-                      ...(title !== undefined && { title }),
-                      ...(info !== undefined && { info }),
-                      full_code: fullCode,
-                      ...(tagsArray && { tags: tagsArray }),
-                    }
-                  : {};
-
               let entityId: string;
-              let hasYears: boolean;
+              let isNew: boolean;
 
               if (isFDC) {
-                const entity = await inspectorPrisma.case.upsert({
+                const existing = await inspectorPrisma.case.findUnique({
                   where: { code_description_id: { code: l3Code, description_id: l2Id } },
-                  update: updateData,
-                  create: {
-                    code: l3Code,
-                    description_id: l2Id,
-                    title,
-                    info,
-                    full_code: fullCode,
-                    tags: tagsArray || [],
-                  },
-                  include: { years: true },
+                  select: { id: true },
                 });
-                entityId = entity.id;
-                hasYears = entity.years.length > 0;
+                if (existing) {
+                  entityId = existing.id;
+                  isNew = false;
+                  if (conflictConfig.level3 === "overwrite") {
+                    await inspectorPrisma.case.update({
+                      where: { id: existing.id },
+                      data: {
+                        ...(title !== undefined && { title }),
+                        ...(info !== undefined && { info }),
+                        full_code: fullCode,
+                        ...(tagsArray && { tags: tagsArray }),
+                      },
+                    });
+                  }
+                } else {
+                  const created = await inspectorPrisma.case.create({
+                    data: {
+                      code: l3Code,
+                      description_id: l2Id,
+                      title,
+                      info,
+                      full_code: fullCode,
+                      tags: tagsArray || [],
+                    },
+                  });
+                  entityId = created.id;
+                  isNew = true;
+                }
               } else {
-                const entity = await inspectorPrisma.file.upsert({
+                const existing = await inspectorPrisma.file.findUnique({
                   where: { code_inventory_id: { code: l3Code, inventory_id: l2Id } },
-                  update: updateData,
-                  create: {
-                    code: l3Code,
-                    inventory_id: l2Id,
-                    title,
-                    info,
-                    full_code: fullCode,
-                    tags: tagsArray || [],
-                  },
-                  include: { years: true },
+                  select: { id: true },
                 });
-                entityId = entity.id;
-                hasYears = entity.years.length > 0;
+                if (existing) {
+                  entityId = existing.id;
+                  isNew = false;
+                  if (conflictConfig.level3 === "overwrite") {
+                    await inspectorPrisma.file.update({
+                      where: { id: existing.id },
+                      data: {
+                        ...(title !== undefined && { title }),
+                        ...(info !== undefined && { info }),
+                        full_code: fullCode,
+                        ...(tagsArray && { tags: tagsArray }),
+                      },
+                    });
+                  }
+                } else {
+                  const created = await inspectorPrisma.file.create({
+                    data: {
+                      code: l3Code,
+                      inventory_id: l2Id,
+                      title,
+                      info,
+                      full_code: fullCode,
+                      tags: tagsArray || [],
+                    },
+                  });
+                  entityId = created.id;
+                  isNew = true;
+                }
               }
 
-              // Add years if entity is new (no existing years)
-              if (!hasYears) {
+              // Add years only for newly created entities
+              if (isNew) {
                 const yearRanges = getYearRanges(node);
                 for (const { start_year, end_year } of yearRanges) {
-                  if (isFDC) {
-                    await inspectorPrisma.caseYear.create({
-                      data: { case_id: entityId, start_year, end_year },
-                    });
-                  } else {
-                    await inspectorPrisma.fileYear.create({
-                      data: { file_id: entityId, start_year, end_year },
-                    });
+                  try {
+                    if (isFDC) {
+                      await inspectorPrisma.caseYear.create({
+                        data: { case_id: entityId, start_year, end_year },
+                      });
+                    } else {
+                      await inspectorPrisma.fileYear.create({
+                        data: { file_id: entityId, start_year, end_year },
+                      });
+                    }
+                  } catch {
+                    // Ignore duplicate year entries
                   }
                 }
               }
@@ -379,14 +414,14 @@ export async function POST(request: NextRequest) {
           })
         );
       }
-      console.timeEnd("CSV Import: Step 3 - Level 3 entities");
+      console.timeEnd("CSV Import: Step 3");
     }
 
     const result: ImportResult = {
       processedCount: rows.length,
       successCount,
       errorCount: errors.length,
-      errors: errors.slice(0, 100), // Limit error list
+      errors: errors.slice(0, 100),
     };
 
     console.log(
