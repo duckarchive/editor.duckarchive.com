@@ -112,12 +112,20 @@ function buildTree(
   return { tree, errors };
 }
 
+function extractYear(str: string): number | null {
+  const match = str.match(/\d{4}/);
+  if (!match) return null;
+  const year = parseInt(match[0], 10);
+  if (year < 1200) return null;
+  return year;
+}
+
 function getYearRanges(node: TreeNode): { start_year: number; end_year: number }[] {
   if (node.years) return parseYears(node.years);
   if (node.start_year && node.end_year) {
-    const start = parseInt(node.start_year, 10);
-    const end = parseInt(node.end_year, 10);
-    if (!isNaN(start) && !isNaN(end)) return [{ start_year: start, end_year: end }];
+    const start = extractYear(node.start_year);
+    const end = extractYear(node.end_year);
+    if (start !== null && end !== null) return [{ start_year: start, end_year: end }];
   }
   if (node.start_year) return parseYears(node.start_year);
   if (node.end_year) return parseYears(node.end_year);
